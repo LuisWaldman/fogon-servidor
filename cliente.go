@@ -25,7 +25,7 @@ func nuevaConexion(clients []any) {
 			par_1 := datas[1].(string)
 			par_2 := datas[2].(string)
 			log.Println("Modo:", modo, "par_1:", par_1, "par_2:", par_2)
-
+			newMusico.login(modo, par_1, par_2)
 		}
 
 	})

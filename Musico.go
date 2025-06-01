@@ -1,8 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/zishang520/socket.io/v2/socket"
 )
+
+var jwtKey = []byte("your-secret-key")
 
 type Musico struct {
 	ID        int
@@ -10,6 +16,34 @@ type Musico struct {
 	Socket    *socket.Socket
 	Room      *Room
 	Character *Character
+}
+
+func (player *Musico) login(modo string, par_1 string, par_2 string) {
+
+	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
+	claims := &jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(expirationTime),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		Subject:   fmt.Sprintf("%d", player.ID), // Using player ID as subject
+		// You can add custom claims here
+		// "name": player.Name,
+		// "modo": modo,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+
+	if err != nil {
+		// Handle error, maybe send an error message to the client
+		fmt.Println("Error generating JWT:", err)
+		player.emit("loginError", "Failed to generate token")
+		return
+	}
+
+	err = player.emit("loginSuccess", map[string]string{"token": tokenString})
+	if err != nil {
+		fmt.Println("Error sending token:", err)
+	}
 }
 
 func NuevoMusico(socket *socket.Socket) *Musico {
