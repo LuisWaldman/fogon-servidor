@@ -8,20 +8,30 @@ import (
 
 var rooms = map[string]*Room{}
 
+func LoginUser(datas ...any) {
+}
+
 func nuevaConexion(clients []any) {
-	newClient := clients[0].(*socket.Socket)
-	newClientID := newClient.Id()
+	newSocket := clients[0].(*socket.Socket)
+	newClientID := newSocket.Id()
 
 	log.Println("Nuevo Musico ID: ", newClientID)
-	newMusico := NuevoMusico(newClient)
+	newMusico := NuevoMusico(newSocket)
 	log.Println("Nuevo Musico: ", newMusico)
-	err := newClient.On("hola", func(datas ...any) {
-		log.Println("holamundo event received", newMusico.Name, "with data:", datas)
+	err := newSocket.On("login", func(datas ...any) {
+		log.Println("evento recivido: login", newMusico.Name, "with data:", datas)
+		if len(datas) == 3 {
+			modo := datas[0].(string)
+			par_1 := datas[1].(string)
+			par_2 := datas[2].(string)
+			log.Println("Modo:", modo, "par_1:", par_1, "par_2:", par_2)
+
+		}
 
 	})
 	if err != nil {
 		log.Println("fallo registrando el mensaje holamundo", "err", err)
-		newClient.Disconnect(true)
+		newSocket.Disconnect(true)
 		return
 	}
 	/*
