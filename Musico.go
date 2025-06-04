@@ -5,15 +5,18 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/zishang520/socket.io/v2/socket"
 )
 
 var jwtKey = []byte("your-secret-key")
 
+type Emitter interface {
+	Emit(ev string, args ...any) error
+}
+
 type Musico struct {
 	ID        int
 	Name      string
-	Socket    *socket.Socket
+	Socket    Emitter
 	Room      *Room
 	Character *Character
 }
@@ -46,7 +49,7 @@ func (player *Musico) login(modo string, par_1 string, par_2 string) {
 	}
 }
 
-func NuevoMusico(socket *socket.Socket) *Musico {
+func NuevoMusico(socket Emitter) *Musico {
 	return &Musico{
 		Socket: socket,
 	}
