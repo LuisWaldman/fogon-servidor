@@ -8,10 +8,12 @@ import (
 )
 
 const Port = ":8080"
+const MONGODB_URI = "mongodb+srv://luis:luis@cluster0.n2rothk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 func main() {
 
 	log.Println("Iniciando servidor en puerto", Port)
+	ConnectDB() // Connect to the database using the function from DataBase.go
 
 	io := socket.NewServer(nil, nil)
 	http.Handle("/socket.io/", io.ServeHandler(nil))
