@@ -5,18 +5,15 @@ import (
 	"net/http"
 
 	ConfigP "fogon-servidor/configP"
+	Controllers "fogon-servidor/controllers"
 
+	"github.com/gin-gonic/gin"
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
-func songsHandler(w http.ResponseWriter, r *http.Request) {
-	// Handle the request for songs here
-	// For example, you can return a JSON response with a list of songs
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"songs": ["Song1", "Song2", "Song3"]}`))
-}
-
 func main() {
+
+	router := gin.Default()
 	AppConfig, err := ConfigP.LoadConfiguration("config.json")
 	if err != nil {
 		log.Fatalln("Failed to load configuration:", err)
@@ -24,7 +21,12 @@ func main() {
 
 	log.Println("Iniciando servidor en puerto", AppConfig.Port)
 	io := socket.NewServer(nil, nil)
-	http.Handle("/socket.io/", io.ServeHandler(nil))
+
+	// Registrar el manejador de socket.io con el router de Gin
+	// Se elimina http.Handle("/socket.io/", io.ServeHandler(nil))
+	// y se añade la siguiente línea:
+	router.Any("/socket.io/*any", gin.WrapH(io.ServeHandler(nil)))
+
 	err = io.On("connection", func(clients ...any) {
 		nuevaConexion(clients)
 	})
@@ -32,8 +34,10 @@ func main() {
 		log.Fatalln("Error setting socket.io on connection", "err", err)
 	}
 	// Handle the new REST endpoint for songs
-	//http.Handle("/socket.io/", io.ServeHandler(nil))
-	http.HandleFunc("/api/songs", songsHandler)
+	//http.Handle("/socket.io/", io.ServeHandler(nil)) // Esta línea ya no es necesaria y puede ser eliminada
 
-	log.Fatalln(http.ListenAndServe(AppConfig.Port, nil))
+	controller := Controllers.NuevoCancionesController()
+	router.GET("/api/songs", controller.GetSongs)
+
+	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
