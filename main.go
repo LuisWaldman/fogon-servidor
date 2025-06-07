@@ -1,37 +1,17 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
-	"os"
+
+	DB "fogon-servidor/DB"
+	ConfigP "fogon-servidor/configP"
 
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
-type Config struct {
-	Port        string `json:"Port"`
-	MONGODB_URI string `json:"MONGODB_URI"`
-}
-
-// AppConfig es la configuración global de la aplicación.
-var AppConfig Config
-
-func LoadConfiguration(file string) (Config, error) {
-	var config Config
-	configFile, err := os.Open(file)
-	if err != nil {
-		return config, err
-	}
-	defer configFile.Close()
-	jsonParser := json.NewDecoder(configFile)
-	err = jsonParser.Decode(&config)
-	return config, err
-}
-
 func main() {
-	var err error
-	AppConfig, err = LoadConfiguration("config.json")
+	AppConfig, err := ConfigP.LoadConfiguration("config.json")
 	if err != nil {
 		log.Fatalln("Failed to load configuration:", err)
 	}
@@ -46,7 +26,7 @@ func main() {
 	}
 
 	// ConnectDB ahora usará AppConfig.MONGODB_URI internamente
-	_, err = ConnectDB()
+	_, err = DB.ConnectDB()
 	if err != nil {
 		log.Fatalln("Failed to connect to MongoDB:", err)
 	}

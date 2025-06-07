@@ -1,4 +1,4 @@
-module cancionero-server
+module fogon-servidor
 
 go 1.23.1
 

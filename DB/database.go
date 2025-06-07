@@ -1,7 +1,8 @@
-package main
+package DB
 
 import (
 	"context"
+	ConfigP "fogon-servidor/configP"
 	"log"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -10,7 +11,7 @@ import (
 
 func ConnectDB() (*mongo.Client, error) {
 	var err error
-
+	AppConfig, _ := ConfigP.LoadConfiguration("./../config.json")
 	var client *mongo.Client
 	client, err = mongo.Connect(options.Client().ApplyURI(AppConfig.MONGODB_URI))
 	if err != nil {
@@ -22,6 +23,6 @@ func ConnectDB() (*mongo.Client, error) {
 		log.Println("Error haciendo ping a MongoDB", "err", err)
 		return nil, err
 	}
-	log.Println("Conectado a MongoDB!")
+	log.Println("Conectado a MongoDB!", AppConfig.MONGODB_URI)
 	return client, err
 }
