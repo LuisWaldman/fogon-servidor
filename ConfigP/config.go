@@ -1,4 +1,4 @@
-package ConfigP
+package configP
 
 import (
 	"encoding/json"
