@@ -13,11 +13,10 @@ import (
 )
 
 func main() {
-
 	router := gin.Default()
 	AppConfig, err := ConfigP.LoadConfiguration("config.json")
 	if err != nil {
-		log.Fatalln("Failed to load configuration:", err)
+		log.Fatalln("Fallo al cargar:", err)
 	}
 
 	log.Println("Iniciando servidor en puerto", AppConfig.Port)
