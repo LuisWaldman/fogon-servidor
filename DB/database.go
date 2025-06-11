@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	ConfigP "github.com/LuisWaldman/fogon-servidor/configP"
+	ConfigP "fogon-servidor/configP"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"

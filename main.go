@@ -4,9 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	Controllers "github.com/LuisWaldman/fogon-servidor/controllers"
-
-	ConfigP "github.com/LuisWaldman/fogon-servidor/configP"
+	ConfigP "fogon-servidor/configP"
+	Controllers "fogon-servidor/controllers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zishang520/socket.io/v2/socket"
