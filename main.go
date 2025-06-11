@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	ConfigP "github.com/LuisWaldman/fogon-servidor/configP"
+	Config "github.com/LuisWaldman/fogon-servidor/config"
 	Controllers "github.com/LuisWaldman/fogon-servidor/controllers"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ import (
 
 func main() {
 	router := gin.Default()
-	AppConfig, err := ConfigP.LoadConfiguration("config.json")
+	AppConfig, err := Config.LoadConfiguration("config.json")
 	if err != nil {
 		log.Fatalln("Fallo al cargar:", err)
 	}
