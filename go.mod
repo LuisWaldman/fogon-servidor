@@ -1,4 +1,4 @@
-module fogon-servidor
+module github.com/LuisWaldman/fogon-servidor
 
 go 1.23.1
 
