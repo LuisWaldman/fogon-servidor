@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  fogon-servidor:
+    image: fogon-servidor
+    container_name: fogon-container
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV_VAR=value
+    volumes:
+      - ./config.json:/app/../config.json # Monta el archivo config.json en la ruta esperada
+    restart: unless-stopped
