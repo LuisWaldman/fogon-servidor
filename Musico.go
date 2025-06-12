@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -103,4 +104,31 @@ func (player *Musico) emit(ev string, args ...any) error {
 	}
 
 	return player.Socket.Emit(ev, args...)
+}
+
+func (player *Musico) VerifyToken(tokenString string) (int, error) {
+	// Parse the token
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		// Ensure the signing method is correct
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtKey, nil
+	})
+
+	if err != nil {
+		return 0, fmt.Errorf("error parsing token: %w", err)
+	}
+
+	// Extract claims
+	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
+		// Convert the subject (user ID) back to an integer
+		userID, err := strconv.Atoi(claims.Subject)
+		if err != nil {
+			return 0, fmt.Errorf("invalid user ID in token: %w", err)
+		}
+		return userID, nil
+	}
+
+	return 0, fmt.Errorf("invalid token")
 }
