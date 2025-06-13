@@ -69,7 +69,7 @@ func TestCreaYBorra(t *testing.T) {
 	err := servicio.CrearUsuario(*usuarioNuevo)
 	assert.Nil(t, err, "Error al crear usuario: %v", err)
 
-	usuariocreado, _ := servicio.BuscarPorUsuario("pero")
+	usuariocreado, _ := servicio.BuscarPorUsuario(nombre)
 	assert.NotNil(t, usuariocreado, "Usuario no encontrado")
 	assert.True(t, usuariocreado.Encontrado, "El usuario debería existir")
 	assert.Equal(t, "USERPASS", usuariocreado.Modologin, "El modo de login no coincide")
