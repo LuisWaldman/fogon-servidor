@@ -12,7 +12,7 @@ import (
 
 func ConnectDB() (*mongo.Client, error) {
 	var err error
-	AppConfig, _ := config.LoadConfiguration("./../config.json")
+	AppConfig := config.LoadConfiguration("./../config.json")
 	var client *mongo.Client
 	client, err = mongo.Connect(options.Client().ApplyURI(AppConfig.MONGODB_URI))
 	if err != nil {

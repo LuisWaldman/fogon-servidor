@@ -1,23 +1,14 @@
 package config
 
-import (
-	"encoding/json"
-	"os"
-)
-
 type Config struct {
 	Port        string `json:"Port"`
 	MONGODB_URI string `json:"MONGODB_URI"`
 }
 
-func LoadConfiguration(file string) (Config, error) {
-	var config Config
-	configFile, err := os.Open(file)
-	if err != nil {
-		return config, err
+func LoadConfiguration(file string) Config {
+	var config Config = Config{
+		Port:        ":8080",
+		MONGODB_URI: "mongodb://localhost:27017",
 	}
-	defer configFile.Close()
-	jsonParser := json.NewDecoder(configFile)
-	err = jsonParser.Decode(&config)
-	return config, err
+	return config
 }
