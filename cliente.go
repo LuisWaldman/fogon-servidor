@@ -3,37 +3,31 @@ package main
 import (
 	"log"
 
+	app "github.com/LuisWaldman/fogon-servidor/app"
 	"github.com/zishang520/socket.io/v2/socket"
 )
-
-var rooms = map[string]*Room{}
 
 func LoginUser(datas ...any) {
 }
 
 func nuevaConexion(clients []any) {
 	newSocket := clients[0].(*socket.Socket)
-	newClientID := newSocket.Id()
-
-	log.Println("Nuevo Musico ID: ", newClientID)
-	newMusico := NuevoMusico(newSocket)
+	newMusico := app.NuevoMusico(newSocket)
+	MyApp.AgregarMusico(newMusico)
 	log.Println("Nuevo Musico: ", newMusico)
-	err := newSocket.On("login", func(datas ...any) {
-		log.Println("evento recivido: login", newMusico.Name, "with data:", datas)
+	newSocket.On("login", func(datas ...any) {
 		if len(datas) == 3 {
 			modo := datas[0].(string)
 			par_1 := datas[1].(string)
 			par_2 := datas[2].(string)
 			log.Println("Modo:", modo, "par_1:", par_1, "par_2:", par_2)
-			newMusico.login(modo, par_1, par_2)
+			newMusico.Login(modo, par_1, par_2)
 		}
 
 	})
-	if err != nil {
-		log.Println("fallo registrando el mensaje holamundo", "err", err)
-		newSocket.Disconnect(true)
-		return
-	}
+	newSocket.On("disconnect", func(...any) {
+		MyApp.QuitarMusico(newMusico)
+	})
 	/*
 		err := newClient.On("changeGravity", func(datas ...any) {
 			log.Println("changeGravity event received")
@@ -290,13 +284,14 @@ func nuevaConexion(clients []any) {
 		}*/
 }
 
-func removeFromRoom(player *Musico) {
-	if player.Room != nil {
-		roomID := player.Room.ID
+func removeFromRoom(player *app.Musico) {
+	/*
+		if player.Room != nil {
+			roomID := player.Room.ID
 
-		playersAmount := player.Room.RemovePlayer(player)
-		if playersAmount == 0 {
-			delete(rooms, roomID)
-		}
-	}
+			playersAmount := player.Room.RemovePlayer(player)
+			if playersAmount == 0 {
+				delete(rooms, roomID)
+			}
+		}*/
 }

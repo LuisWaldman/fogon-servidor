@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"fmt"
@@ -15,14 +15,12 @@ type Emitter interface {
 }
 
 type Musico struct {
-	ID        int
-	Name      string
-	Socket    Emitter
-	Room      *Room
-	Character *Character
+	ID      int
+	Usuario string
+	Socket  Emitter
 }
 
-func (player *Musico) login(modo string, par_1 string, par_2 string) {
+func (player *Musico) Login(modo string, par_1 string, par_2 string) {
 
 	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
 	claims := &jwt.RegisteredClaims{
@@ -44,6 +42,7 @@ func (player *Musico) login(modo string, par_1 string, par_2 string) {
 		return
 	}
 
+	player.Usuario = par_1 // Assuming par_1 is the username or identifier
 	err = player.emit("loginSuccess", map[string]string{"token": tokenString})
 	if err != nil {
 		fmt.Println("Error sending token:", err)
@@ -52,50 +51,9 @@ func (player *Musico) login(modo string, par_1 string, par_2 string) {
 
 func NuevoMusico(socket Emitter) *Musico {
 	return &Musico{
+		ID:     0, // Default ID, should be set after login
 		Socket: socket,
 	}
-}
-
-func (player *Musico) SendTick(playersPositions []any, cameraX int) error {
-	return player.emit("tick", playersPositions, cameraX)
-}
-
-func (player *Musico) SendInicioJuego() error {
-	return player.emit("inicioJuego")
-}
-
-func (player *Musico) SendReplica(nombre_usuario string, datos interface{}) error {
-	return player.emit("replica", nombre_usuario, datos)
-}
-
-func (player *Musico) SendLista(bandas []string, temas []string) error {
-	return player.emit("lista", bandas, temas)
-}
-func (player *Musico) SendCambioCompas(compas int) error {
-	return player.emit("compas", compas)
-}
-
-func (player *Musico) IniciarCompas(compas int) error {
-	return player.emit("start_compas", compas)
-}
-
-func (player *Musico) SendCambioCancion(cancion int) error {
-	return player.emit("cancion", cancion)
-}
-
-func (player *Musico) SendInformacionSala(roomUUID string, mapName string, players []map[string]any) error {
-	return player.emit("informacionSala", roomUUID, mapName, players)
-}
-
-func (player *Musico) ToInformacionSalaInfo() map[string]any {
-	return map[string]any{
-		"numeroJugador": player.ID,
-		"nombre":        player.Name,
-	}
-}
-
-func (player *Musico) SendCarreraTerminada(raceResult []map[string]any) error {
-	return player.emit("carreraTerminada", raceResult)
 }
 
 func (player *Musico) emit(ev string, args ...any) error {
@@ -106,7 +64,7 @@ func (player *Musico) emit(ev string, args ...any) error {
 	return player.Socket.Emit(ev, args...)
 }
 
-func (player *Musico) VerifyToken(tokenString string) (int, error) {
+func VerifyToken(tokenString string) (int, error) {
 	// Parse the token
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Ensure the signing method is correct

@@ -1,4 +1,4 @@
-package main
+package app
 
 type EmittedEvent struct {
 	Event string

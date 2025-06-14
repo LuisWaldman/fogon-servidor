@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ func TestLoginHandler(t *testing.T) {
 	newMusico.ID = 123 // Asigna un ID al usuario para la prueba
 
 	// Llama al método login
-	newMusico.login("USERPASS", "par_1", "par_2")
+	newMusico.Login("USERPASS", "par_1", "par_2")
 
 	// Verifica que el evento emitido sea "loginSuccess"
 	assert.Equal(t, "loginSuccess", newSocket.UltimoEmitted().Event, "No dio loginSuccess")
@@ -25,7 +25,7 @@ func TestLoginHandler(t *testing.T) {
 	assert.True(t, exists, "El token no fue emitido")
 
 	// Usa VerifyToken para validar el token
-	userID, err := newMusico.VerifyToken(tokenString)
+	userID, err := VerifyToken(tokenString)
 	assert.NoError(t, err, "Error al verificar el token")
 	assert.Equal(t, newMusico.ID, userID, "El ID del usuario no coincide con el token")
 }

@@ -3,7 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 
+	app "github.com/LuisWaldman/fogon-servidor/app"
 	Config "github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/controllers"
 	"github.com/LuisWaldman/fogon-servidor/db"
@@ -30,9 +32,53 @@ func corsMiddleware() gin.HandlerFunc {
 	}
 }
 
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		if strings.HasPrefix(c.Request.URL.RequestURI(), "/socket.io/") {
+			c.Next()
+			return
+		}
+
+		// Obtener el token del header Authorization
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token requerido"})
+			c.Abort()
+			return
+		}
+
+		// Extraer el token eliminando "Bearer "
+		token := strings.TrimPrefix(authHeader, "Bearer ")
+		userID, err := app.VerifyToken(token)
+		if err != nil {
+			log.Println("Error al verificar el token:", err)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
+			c.Abort()
+			return
+		}
+		c.Set("userID", userID) // Almacenar el ID de usuario para su uso posterior
+
+		// Validar el token (esto depende de tu lógica de autenticación)
+		/*if !validateToken(token) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
+			c.Abort()
+			return
+		}
+		*/
+		// Si el token es válido, continuar con la solicitud
+		c.Set("token", token) // Puedes almacenar el token para su uso posterior
+		c.Next()
+	}
+}
+
+var MyApp = app.NuevoAplicacion()
+
 func main() {
 	router := gin.Default()
 	router.Use(corsMiddleware())
+	router.Use(AuthMiddleware())
+
 	AppConfig := Config.LoadConfiguration("config.json")
 
 	log.Println("Iniciando servidor en puerto", AppConfig.Port)
@@ -57,7 +103,7 @@ func main() {
 	}
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
-	constroladorServicio := controllers.NuevoPerfilController(perfilServicio)
+	constroladorServicio := controllers.NuevoPerfilController(perfilServicio, MyApp)
 
 	router.GET("/perfil", constroladorServicio.Get)
 	router.POST("/perfil", constroladorServicio.Post)
