@@ -4,15 +4,16 @@ import (
 	"log"
 
 	app "github.com/LuisWaldman/fogon-servidor/app"
+	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
 func LoginUser(datas ...any) {
 }
 
-func nuevaConexion(clients []any) {
+func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	newSocket := clients[0].(*socket.Socket)
-	newMusico := app.NuevoMusico(newSocket)
+	newMusico := app.NuevoMusico(newSocket, logRepo)
 	MyApp.AgregarMusico(newMusico)
 	log.Println("Nuevo Musico: ", newMusico)
 	newSocket.On("login", func(datas ...any) {

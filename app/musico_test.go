@@ -13,7 +13,7 @@ func TestLoginHandler(t *testing.T) {
 	newMusico.ID = 123 // Asigna un ID al usuario para la prueba
 
 	// Llama al método login
-	newMusico.Login("USERPASS", "par_1", "par_2")
+	newMusico.Login("USERPASS", "par_1", "VALIDA")
 
 	// Verifica que el evento emitido sea "loginSuccess"
 	assert.Equal(t, "loginSuccess", newSocket.UltimoEmitted().Event, "No dio loginSuccess")
@@ -28,4 +28,18 @@ func TestLoginHandler(t *testing.T) {
 	userID, err := VerifyToken(tokenString)
 	assert.NoError(t, err, "Error al verificar el token")
 	assert.Equal(t, newMusico.ID, userID, "El ID del usuario no coincide con el token")
+}
+
+func TestLoginFailed(t *testing.T) {
+	// Crea un mock de socket.Socket usando testify/mock o una estructura personalizada
+	newSocket := &MockSocket{}
+	newMusico := NuevoMusico(newSocket)
+	newMusico.ID = 123 // Asigna un ID al usuario para la prueba
+
+	// Llama al método login
+	newMusico.Login("USERPASS", "par_1", "OTRACONTRASEÑA")
+
+	// Verifica que el evento emitido sea "loginSuccess"
+	assert.Equal(t, "loginFailed", newSocket.UltimoEmitted().Event, "No dio loginFailed")
+
 }

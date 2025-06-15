@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -18,41 +19,43 @@ type Musico struct {
 	ID      int
 	Usuario string
 	Socket  Emitter
+	logRepo logueadores.LogeadorRepository
 }
 
-func (player *Musico) Login(modo string, par_1 string, par_2 string) {
+func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
+	if !musico.logRepo.Login(modo, par_1, par_2) {
+		musico.emit("loginFailed", "Failed to generate token")
+		return
+	}
 
 	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
 	claims := &jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(expirationTime),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		Subject:   fmt.Sprintf("%d", player.ID), // Using player ID as subject
-		// You can add custom claims here
-		// "name": player.Name,
-		// "modo": modo,
+		Subject:   fmt.Sprintf("%d", musico.ID), // Using player ID as subject
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
-
 	if err != nil {
 		// Handle error, maybe send an error message to the client
 		fmt.Println("Error generating JWT:", err)
-		player.emit("loginError", "Failed to generate token")
+		musico.emit("loginFailed", "Failed to generate token")
 		return
 	}
 
-	player.Usuario = par_1 // Assuming par_1 is the username or identifier
-	err = player.emit("loginSuccess", map[string]string{"token": tokenString})
+	musico.Usuario = par_1 // Assuming par_1 is the username or identifier
+	err = musico.emit("loginSuccess", map[string]string{"token": tokenString})
 	if err != nil {
 		fmt.Println("Error sending token:", err)
 	}
 }
 
-func NuevoMusico(socket Emitter) *Musico {
+func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository) *Musico {
 	return &Musico{
-		ID:     0, // Default ID, should be set after login
-		Socket: socket,
+		ID:      0, // Default ID, should be set after login
+		Socket:  socket,
+		logRepo: logRepo,
 	}
 }
 

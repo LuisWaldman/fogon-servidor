@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	app "github.com/LuisWaldman/fogon-servidor/app"
+	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
 	Config "github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/controllers"
 	"github.com/LuisWaldman/fogon-servidor/db"
@@ -81,21 +82,6 @@ func main() {
 
 	AppConfig := Config.LoadConfiguration("config.json")
 
-	log.Println("Iniciando servidor en puerto", AppConfig.Port)
-	io := socket.NewServer(nil, nil)
-
-	// Registrar el manejador de socket.io con el router de Gin
-	// Se elimina http.Handle("/socket.io/", io.ServeHandler(nil))
-	// y se añade la siguiente línea:
-	router.Any("/socket.io/*any", gin.WrapH(io.ServeHandler(nil)))
-
-	err := io.On("connection", func(clients ...any) {
-		nuevaConexion(clients)
-	})
-	if err != nil {
-		log.Fatalln("Error setting socket.io on connection", "err", err)
-	}
-
 	client, err := db.ConnectDB()
 	if err != nil {
 		log.Fatalln("Error al conectar a la base de datos:", err)
@@ -104,6 +90,25 @@ func main() {
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
 	constroladorServicio := controllers.NuevoPerfilController(perfilServicio, MyApp)
+
+	usuarioServicio := servicios.NuevoUsuarioServicio(client)
+	logRepo := logueadores.NewLogeadorRepository()
+	logRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
+
+	log.Println("Iniciando servidor en puerto", AppConfig.Port)
+	io := socket.NewServer(nil, nil)
+
+	// Registrar el manejador de socket.io con el router de Gin
+	// Se elimina http.Handle("/socket.io/", io.ServeHandler(nil))
+	// y se añade la siguiente línea:
+	router.Any("/socket.io/*any", gin.WrapH(io.ServeHandler(nil)))
+
+	err = io.On("connection", func(clients ...any) {
+		nuevaConexion(clients, *logRepo)
+	})
+	if err != nil {
+		log.Fatalln("Error setting socket.io on connection", "err", err)
+	}
 
 	router.GET("/perfil", constroladorServicio.Get)
 	router.POST("/perfil", constroladorServicio.Post)
