@@ -23,6 +23,7 @@ func NuevoPerfilServicio(db *mongo.Client) *PerfilServicio {
 }
 
 func (s *PerfilServicio) CrearPerfil(user modelo.Perfil) error {
+	s.BorrarPorUsuario(user.Usuario) // Elimina el perfil existente antes de crear uno nuevo
 	col := s.db.Database(database).Collection(s.collection)
 	inserta, err := col.InsertOne(context.TODO(), user)
 	if err != nil {

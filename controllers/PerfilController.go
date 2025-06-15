@@ -21,9 +21,9 @@ func NuevoPerfilController(service *servicios.PerfilServicio, aplicacion *app.Ap
 }
 
 func (sc *PerfilController) Get(c *gin.Context) {
-	user, _ := c.Get("userID") // This is to ensure the middleware has run and set the userID
+	user, _ := c.Get("userID")
 	log.Println("LLEGO A PERFIL GET", "method", c.Request.Method, "path", c.Request.URL.Path, "userID", user)
-	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int)) // Ensure user is of type string
+	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int))
 	perfil, _ := sc.service.BuscarPorUsuario(musico.Usuario)
 	c.JSON(http.StatusOK, perfil)
 }
@@ -39,6 +39,7 @@ func (sc *PerfilController) Post(c *gin.Context) {
 	log.Println("LLEGO A PERFIL POST", "method", c.Request.Method, "path", c.Request.URL.Path, "userID", user)
 	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int)) // Ensure user is of type string
 	perfil.Usuario = musico.Usuario                          // Set the user for the profile
+
 	sc.service.CrearPerfil(perfil)
 	c.JSON(http.StatusCreated, gin.H{"message": "Perfil creado exitosamente"})
 

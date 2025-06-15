@@ -3,9 +3,7 @@ module github.com/LuisWaldman/fogon-servidor
 go 1.23.1
 
 require (
-	github.com/elliotchance/pie/v2 v2.9.0
 	github.com/gin-gonic/gin v1.10.1
-	github.com/solarlune/resolv v0.7.0
 	github.com/stretchr/testify v1.10.0
 	github.com/zishang520/socket.io/v2 v2.3.0
 	go.mongodb.org/mongo-driver/v2 v2.2.2
