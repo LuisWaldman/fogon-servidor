@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func CreoSesion(t *testing.T) {
+func TestCreoSesion(t *testing.T) {
 	app := NuevoAplicacion()
 	loginRepo := logueadores.NewLogeadorRepository()
 	claves := []string{"VALIDA"}
@@ -34,4 +34,22 @@ func CreoSesion(t *testing.T) {
 	}
 
 	assert.Equal(t, "ensesion", newSocket.UltimoEmitted().Event, "No dio ensesion")
+
+	otromusico := NuevoMusico(newSocket, *loginRepo)
+	app.AgregarMusico(otromusico)
+	app.UnirseSesion(otromusico, sesionID)
+	assert.Equal(t, "ensesion", newSocket.UltimoEmitted().Event, "No dio ensesion")
+}
+
+func TestSeUneASesionInexistente(t *testing.T) {
+	app := NuevoAplicacion()
+	loginRepo := logueadores.NewLogeadorRepository()
+	claves := []string{"VALIDA"}
+	loginRepo.Add("TEST", logueadores.NewTesterLogeador(claves))
+	newSocket := &MockSocket{}
+	musico := NuevoMusico(newSocket, *loginRepo)
+	app.AgregarMusico(musico)
+
+	app.UnirseSesion(musico, "sesion_inexistente")
+	assert.Equal(t, "sesionFailed", newSocket.UltimoEmitted().Event, "No dio sesionFailed")
 }
