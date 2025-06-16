@@ -20,6 +20,14 @@ type Musico struct {
 	Usuario string
 	Socket  Emitter
 	logRepo logueadores.LogeadorRepository
+
+	sesion *Sesion
+}
+
+func (musico *Musico) UnirseSesion(sesion *Sesion) {
+	musico.sesion = sesion
+	sesion.AgregarMusico(musico)
+	musico.emit("ensesion", sesion.sesion)
 }
 
 func (musico *Musico) Login(modo string, par_1 string, par_2 string) {

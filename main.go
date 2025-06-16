@@ -92,8 +92,8 @@ func main() {
 	constroladorServicio := controllers.NuevoPerfilController(perfilServicio, MyApp)
 
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
-	logRepo := logueadores.NewLogeadorRepository()
-	logRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
+	loginRepo := logueadores.NewLogeadorRepository()
+	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
 
 	log.Println("Iniciando servidor en puerto", AppConfig.Port)
 	io := socket.NewServer(nil, nil)
@@ -104,7 +104,7 @@ func main() {
 	router.Any("/socket.io/*any", gin.WrapH(io.ServeHandler(nil)))
 
 	err = io.On("connection", func(clients ...any) {
-		nuevaConexion(clients, *logRepo)
+		nuevaConexion(clients, *loginRepo)
 	})
 	if err != nil {
 		log.Fatalln("Error setting socket.io on connection", "err", err)
