@@ -3,6 +3,7 @@ package servicios
 import (
 	"testing"
 
+	datos "github.com/LuisWaldman/fogon-servidor/datos"
 	db "github.com/LuisWaldman/fogon-servidor/db"
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestCrearUsuarioServicio(t *testing.T) {
 	usuario.Modologin = "USERPASS"
 	usuario.Usuario = "servicio1"
 	usuario.Clave = "clave1"
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoUsuarioServicio(client)
 	err = servicio.CrearUsuario(*usuario)

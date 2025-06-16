@@ -9,7 +9,7 @@ import (
 	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
 	Config "github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/controllers"
-	"github.com/LuisWaldman/fogon-servidor/db"
+	"github.com/LuisWaldman/fogon-servidor/datos"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 
 	"github.com/gin-gonic/gin"
@@ -82,7 +82,7 @@ func main() {
 
 	AppConfig := Config.LoadConfiguration("config.json")
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	if err != nil {
 		log.Fatalln("Error al conectar a la base de datos:", err)
 		return
