@@ -3,14 +3,14 @@ package logueadores
 import (
 	"testing"
 
-	"github.com/LuisWaldman/fogon-servidor/db"
+	"github.com/LuisWaldman/fogon-servidor/datos"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewUserPassLogeador(t *testing.T) {
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := servicios.NuevoUsuarioServicio(client)
 	logeador := NewUserPassLogeador(servicio)
