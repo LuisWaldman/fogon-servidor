@@ -1,4 +1,4 @@
-package app
+package aplicacion
 
 type Aplicacion struct {
 	musicos map[int]*Musico

@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	app "github.com/LuisWaldman/fogon-servidor/app"
-	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
+	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
+	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
@@ -13,7 +13,7 @@ func LoginUser(datas ...any) {
 
 func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	newSocket := clients[0].(*socket.Socket)
-	newMusico := app.NuevoMusico(newSocket, logRepo)
+	newMusico := aplicacion.NuevoMusico(newSocket, logRepo)
 	MyApp.AgregarMusico(newMusico)
 	log.Println("Nuevo Musico: ", newMusico)
 	newSocket.On("login", func(datas ...any) {
@@ -285,7 +285,7 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}*/
 }
 
-func removeFromRoom(player *app.Musico) {
+func removeFromRoom(player *aplicacion.Musico) {
 	/*
 		if player.Room != nil {
 			roomID := player.Room.ID

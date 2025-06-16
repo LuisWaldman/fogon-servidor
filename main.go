@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	app "github.com/LuisWaldman/fogon-servidor/app"
-	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
+	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
+	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
 	Config "github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/controllers"
 	"github.com/LuisWaldman/fogon-servidor/datos"
@@ -51,7 +51,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// Extraer el token eliminando "Bearer "
 		token := strings.TrimPrefix(authHeader, "Bearer ")
-		userID, err := app.VerifyToken(token)
+		userID, err := aplicacion.VerifyToken(token)
 		if err != nil {
 			log.Println("Error al verificar el token:", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
@@ -73,7 +73,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-var MyApp = app.NuevoAplicacion()
+var MyApp = aplicacion.NuevoAplicacion()
 
 func main() {
 	router := gin.Default()

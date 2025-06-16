@@ -1,11 +1,11 @@
-package app
+package aplicacion
 
 import (
 	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/LuisWaldman/fogon-servidor/app/logueadores"
+	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
 	"github.com/golang-jwt/jwt/v5"
 )
 

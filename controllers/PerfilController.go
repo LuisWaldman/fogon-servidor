@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/LuisWaldman/fogon-servidor/app"
+	"github.com/LuisWaldman/fogon-servidor/aplicacion"
 	"github.com/LuisWaldman/fogon-servidor/modelo"
 	servicios "github.com/LuisWaldman/fogon-servidor/servicios" // Adjust the import path as necessary
 	"github.com/gin-gonic/gin"
@@ -12,10 +12,10 @@ import (
 
 type PerfilController struct {
 	service    *servicios.PerfilServicio
-	aplicacion *app.Aplicacion
+	aplicacion *aplicacion.Aplicacion
 }
 
-func NuevoPerfilController(service *servicios.PerfilServicio, aplicacion *app.Aplicacion) *PerfilController {
+func NuevoPerfilController(service *servicios.PerfilServicio, aplicacion *aplicacion.Aplicacion) *PerfilController {
 	return &PerfilController{service: service, aplicacion: aplicacion} //{service: service}
 
 }
