@@ -42,6 +42,14 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 			MyApp.UnirseSesion(newMusico, sesion)
 		}
 	})
+
+	newSocket.On("mensajeasesion", func(datas ...any) {
+		if len(datas) == 1 {
+			msj := datas[0].(string)
+			log.Println("mensajeasesion - Sesion:", msj)
+			newMusico.MensajeSesion(msj)
+		}
+	})
 	newSocket.On("disconnect", func(...any) {
 		MyApp.QuitarMusico(newMusico)
 	})

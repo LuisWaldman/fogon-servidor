@@ -8,6 +8,13 @@ type Sesion struct {
 	estado   string
 }
 
+func (sesion *Sesion) MensajeSesion(msj string) {
+	for _, sesion := range sesion.musicos {
+		sesion.Socket.Emit("mensajesesion", msj)
+	}
+
+}
+
 func (sesion *Sesion) AgregarMusico(musico *Musico) {
 	if musico == nil {
 		return

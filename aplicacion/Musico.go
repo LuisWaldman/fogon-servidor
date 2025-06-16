@@ -30,6 +30,15 @@ func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.emit("ensesion", sesion.nombre)
 }
 
+func (musico *Musico) MensajeSesion(msj string) {
+	if musico.sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.sesion.MensajeSesion(msj)
+
+}
+
 func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
 	if !musico.logRepo.Login(modo, par_1, par_2) {
 		musico.emit("loginFailed", "Failed to generate token")
