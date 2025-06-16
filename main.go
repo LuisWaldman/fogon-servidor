@@ -59,16 +59,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Set("userID", userID) // Almacenar el ID de usuario para su uso posterior
-
-		// Validar el token (esto depende de tu lógica de autenticación)
-		/*if !validateToken(token) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-			c.Abort()
-			return
-		}
-		*/
-		// Si el token es válido, continuar con la solicitud
-		c.Set("token", token) // Puedes almacenar el token para su uso posterior
+		c.Set("token", token)   // Puedes almacenar el token para su uso posterior
 		c.Next()
 	}
 }
@@ -89,7 +80,8 @@ func main() {
 	}
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
-	constroladorServicio := controllers.NuevoPerfilController(perfilServicio, MyApp)
+	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
+	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
@@ -110,8 +102,9 @@ func main() {
 		log.Fatalln("Error setting socket.io on connection", "err", err)
 	}
 
-	router.GET("/perfil", constroladorServicio.Get)
-	router.POST("/perfil", constroladorServicio.Post)
+	router.GET("/perfil", constroladorPerfil.Get)
+	router.POST("/perfil", constroladorPerfil.Post)
+	router.GET("/sesiones", constroladorSesiones.Get)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }

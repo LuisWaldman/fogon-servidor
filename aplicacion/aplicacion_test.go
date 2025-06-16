@@ -29,7 +29,7 @@ func TestCreoSesion(t *testing.T) {
 		return
 	}
 
-	if sesion.sesion != sesionID || sesion.latitud != latitud || sesion.longitud != longitud {
+	if sesion.nombre != sesionID || sesion.latitud != latitud || sesion.longitud != longitud {
 		t.Errorf("Los datos de la sesión no coinciden: got %v, want %s, %f, %f", sesion, sesionID, latitud, longitud)
 	}
 

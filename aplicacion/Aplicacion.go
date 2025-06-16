@@ -1,5 +1,7 @@
 package aplicacion
 
+import "log"
+
 type Aplicacion struct {
 	musicos  map[int]*Musico
 	sesiones map[string]*Sesion
@@ -10,6 +12,30 @@ func NuevoAplicacion() *Aplicacion {
 		musicos:  make(map[int]*Musico),
 		sesiones: make(map[string]*Sesion),
 	}
+}
+
+type SesionView struct {
+	Nombre   string  `bson:"nombre"`
+	Latitud  float64 `bson:"latitud"`
+	Longitud float64 `bson:"longitud"`
+	Usuarios int     `bson:"usuarios"`
+	Estado   string  `bson:"estado"`
+}
+
+func (app *Aplicacion) GetSesionView() []SesionView {
+	sesiones := make([]SesionView, 0, len(app.sesiones))
+	for _, sesion := range app.sesiones {
+		log.Println("Procesando sesion:", sesion.nombre)
+		sv := SesionView{
+			Nombre:   sesion.nombre,
+			Latitud:  sesion.latitud,
+			Longitud: sesion.longitud,
+			Usuarios: len(sesion.musicos),
+			Estado:   sesion.estado,
+		}
+		sesiones = append(sesiones, sv)
+	}
+	return sesiones
 }
 
 func (app *Aplicacion) AgregarMusico(musico *Musico) {
@@ -44,7 +70,7 @@ func (app *Aplicacion) CrearSesion(musico *Musico, sesion string, latitud float6
 
 	// Create a new session
 	newSesion := &Sesion{
-		sesion:   sesion,
+		nombre:   sesion,
 		latitud:  latitud,
 		longitud: longitud,
 	}

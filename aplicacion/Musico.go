@@ -27,7 +27,7 @@ type Musico struct {
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.sesion = sesion
 	sesion.AgregarMusico(musico)
-	musico.emit("ensesion", sesion.sesion)
+	musico.emit("ensesion", sesion.nombre)
 }
 
 func (musico *Musico) Login(modo string, par_1 string, par_2 string) {

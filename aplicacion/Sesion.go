@@ -1,10 +1,11 @@
 package aplicacion
 
 type Sesion struct {
-	sesion   string
+	nombre   string
 	latitud  float64
 	longitud float64
 	musicos  map[int]*Musico
+	estado   string
 }
 
 func (sesion *Sesion) AgregarMusico(musico *Musico) {
