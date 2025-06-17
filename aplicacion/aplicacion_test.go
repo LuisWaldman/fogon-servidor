@@ -53,3 +53,20 @@ func TestSeUneASesionInexistente(t *testing.T) {
 	app.UnirseSesion(musico, "sesion_inexistente")
 	assert.Equal(t, "sesionFailed", newSocket.UltimoEmitted().Event, "No dio sesionFailed")
 }
+
+func TestEliminaSesionesSinUsuarios(t *testing.T) {
+	app := NuevoAplicacion()
+	loginRepo := logueadores.NewLogeadorRepository()
+	claves := []string{"VALIDA"}
+	loginRepo.Add("TEST", logueadores.NewTesterLogeador(claves))
+	newSocket := &MockSocket{}
+	musico := NuevoMusico(newSocket, *loginRepo)
+	app.AgregarMusico(musico)
+
+	app.CrearSesion(musico, "sesion", 0, 3.14)
+	assert.Equal(t, 1, len(app.sesiones), "Hay sesiones")
+	musico.SalirSesion()
+	app.ActualizarSesiones()
+	assert.Equal(t, 0, len(app.sesiones), "Hay sesiones")
+
+}

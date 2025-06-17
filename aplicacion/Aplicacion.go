@@ -46,6 +46,14 @@ func (app *Aplicacion) AgregarMusico(musico *Musico) {
 	app.musicos[musico.ID] = musico
 }
 
+func (app *Aplicacion) ActualizarSesiones() {
+	for nombre, sesion := range app.sesiones {
+		if len(sesion.musicos) == 0 {
+			delete(app.sesiones, nombre)
+		}
+	}
+}
+
 func (app *Aplicacion) QuitarMusico(musico *Musico) {
 	if musico == nil {
 		return

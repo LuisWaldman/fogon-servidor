@@ -34,6 +34,10 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 			MyApp.CrearSesion(newMusico, sesion, latitud, longitud)
 		}
 	})
+	newSocket.On("salirsesion", func(datas ...any) {
+		newMusico.SalirSesion()
+		MyApp.ActualizarSesiones()
+	})
 
 	newSocket.On("unirmesesion", func(datas ...any) {
 		if len(datas) == 1 {
@@ -51,18 +55,8 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}
 	})
 	newSocket.On("disconnect", func(...any) {
+		newMusico.SalirSesion()
+		MyApp.ActualizarSesiones()
 		MyApp.QuitarMusico(newMusico)
 	})
-}
-
-func removeFromRoom(player *aplicacion.Musico) {
-	/*
-		if player.Room != nil {
-			roomID := player.Room.ID
-
-			playersAmount := player.Room.RemovePlayer(player)
-			if playersAmount == 0 {
-				delete(rooms, roomID)
-			}
-		}*/
 }

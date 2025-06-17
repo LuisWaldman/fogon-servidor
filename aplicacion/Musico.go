@@ -21,13 +21,36 @@ type Musico struct {
 	Socket  Emitter
 	logRepo logueadores.LogeadorRepository
 
-	sesion *Sesion
+	sesion    *Sesion
+	rolSesion string
 }
 
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.sesion = sesion
+	musico.rolSesion = "default" // Default role for a musician
 	sesion.AgregarMusico(musico)
 	musico.emit("ensesion", sesion.nombre)
+}
+
+// SetRolSesion sets the role of the musician in the session
+func (musico *Musico) SetRolSesion(rol string) {
+	if musico.sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.rolSesion = rol
+	musico.emit("rolsesion", rol)
+}
+
+func (musico *Musico) SalirSesion() {
+	if musico.sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.sesion.SalirSesion(musico)
+	musico.sesion = nil
+	musico.rolSesion = "default"
+	musico.emit("salirsesion", "You have left the session")
 }
 
 func (musico *Musico) MensajeSesion(msj string) {
