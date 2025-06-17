@@ -58,7 +58,7 @@ func TestQuedaDirector(t *testing.T) {
 	newMusico2.UnirseSesion(sesion)
 	newMusico.SalirSesion()
 
-	assert.Equal(t, "rolsesion", newSocket2.UltimoEmitted().Event, "No dio cambiorolensesion")
+	assert.Equal(t, "rolSesion", newSocket2.UltimoEmitted().Event, "No dio cambiorolensesion")
 	mensaje, _ := newSocket2.UltimoEmitted().Args[0].(string)
 	assert.Equal(t, "director", mensaje, "Mensaje no coincide")
 	assert.Equal(t, "director", newMusico2.rolSesion, "Rol no coincide")

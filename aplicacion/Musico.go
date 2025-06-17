@@ -39,7 +39,7 @@ func (musico *Musico) SetRolSesion(rol string) {
 		return
 	}
 	musico.rolSesion = rol
-	musico.emit("rolsesion", rol)
+	musico.emit("rolSesion", rol)
 }
 
 func (musico *Musico) SalirSesion() {
