@@ -52,3 +52,19 @@ func TestLoginFailed(t *testing.T) {
 	assert.Equal(t, "loginFailed", newSocket.UltimoEmitted().Event, "No dio loginFailed")
 
 }
+
+func TestTieneSesion(t *testing.T) {
+	// Crea un mock de socket.Socket usando testify/mock o una estructura personalizada
+	loginRepo := logueadores.NewLogeadorRepository()
+	claves := []string{"VALIDA"}
+	loginRepo.Add("TEST", logueadores.NewTesterLogeador(claves))
+	newSocket := &MockSocket{}
+	newMusico := NuevoMusico(newSocket, *loginRepo)
+	newMusico.ID = 123 // Asigna un ID al usuario para la prueba
+	sesion := &Sesion{
+		nombre: "TestSession",
+	}
+	assert.False(t, !newMusico.TieneSesion(), "El músico no debería tener una sesión activa al inicio")
+	newMusico.UnirseSesion(sesion)
+	assert.True(t, !newMusico.TieneSesion(), "El músico  debería tener una sesión activa")
+}

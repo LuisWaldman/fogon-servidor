@@ -82,6 +82,7 @@ func main() {
 	perfilServicio := servicios.NuevoPerfilServicio(client)
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
+	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
@@ -105,6 +106,7 @@ func main() {
 	router.GET("/perfil", constroladorPerfil.Get)
 	router.POST("/perfil", constroladorPerfil.Post)
 	router.GET("/sesiones", constroladorSesiones.Get)
+	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }

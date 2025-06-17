@@ -16,17 +16,17 @@ type Emitter interface {
 }
 
 type Musico struct {
-	ID      int
-	Usuario string
-	Socket  Emitter
-	logRepo logueadores.LogeadorRepository
-
-	sesion    *Sesion
-	rolSesion string
+	ID           int
+	Usuario      string
+	Socket       Emitter
+	logRepo      logueadores.LogeadorRepository
+	NombrePerfil string
+	Sesion       *Sesion
+	rolSesion    string
 }
 
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
-	musico.sesion = sesion
+	musico.Sesion = sesion
 	musico.rolSesion = "default" // Default role for a musician
 	sesion.AgregarMusico(musico)
 	musico.emit("ensesion", sesion.nombre)
@@ -34,7 +34,7 @@ func (musico *Musico) UnirseSesion(sesion *Sesion) {
 
 // SetRolSesion sets the role of the musician in the session
 func (musico *Musico) SetRolSesion(rol string) {
-	if musico.sesion == nil {
+	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
@@ -43,22 +43,22 @@ func (musico *Musico) SetRolSesion(rol string) {
 }
 
 func (musico *Musico) SalirSesion() {
-	if musico.sesion == nil {
+	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
-	musico.sesion.SalirSesion(musico)
-	musico.sesion = nil
+	musico.Sesion.SalirSesion(musico)
+	musico.Sesion = nil
 	musico.rolSesion = "default"
 	musico.emit("salirsesion", "You have left the session")
 }
 
 func (musico *Musico) MensajeSesion(msj string) {
-	if musico.sesion == nil {
+	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
-	musico.sesion.MensajeSesion(msj)
+	musico.Sesion.MensajeSesion(msj)
 
 }
 
@@ -105,6 +105,10 @@ func (player *Musico) emit(ev string, args ...any) error {
 	}
 
 	return player.Socket.Emit(ev, args...)
+}
+
+func (musico *Musico) TieneSesion() bool {
+	return musico.Sesion != nil
 }
 
 func VerifyToken(tokenString string) (int, error) {

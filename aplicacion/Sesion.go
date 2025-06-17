@@ -15,6 +15,23 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 
 }
 
+type UsuarioSesionView struct {
+	Usuario      string `bson:"usuario"`
+	NombrePerfil string `bson:"nombre_perfil"`
+	RolSesion    string `bson:"rol_sesion"`
+}
+
+func (sesion *Sesion) GetUsuariosView() []UsuarioSesionView {
+	usuarios := make([]UsuarioSesionView, 0, len(sesion.musicos))
+	for _, musico := range sesion.musicos {
+		usuarios = append(usuarios, UsuarioSesionView{
+			Usuario:      musico.Usuario,
+			NombrePerfil: musico.NombrePerfil,
+			RolSesion:    musico.rolSesion,
+		})
+	}
+	return usuarios
+}
 func (sesion *Sesion) AgregarMusico(musico *Musico) {
 	if musico == nil {
 		return
