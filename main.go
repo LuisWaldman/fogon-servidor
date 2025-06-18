@@ -59,16 +59,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Set("userID", userID) // Almacenar el ID de usuario para su uso posterior
-
-		// Validar el token (esto depende de tu lógica de autenticación)
-		/*if !validateToken(token) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-			c.Abort()
-			return
-		}
-		*/
-		// Si el token es válido, continuar con la solicitud
-		c.Set("token", token) // Puedes almacenar el token para su uso posterior
+		c.Set("token", token)   // Puedes almacenar el token para su uso posterior
 		c.Next()
 	}
 }
@@ -79,7 +70,7 @@ func main() {
 	router := gin.Default()
 	router.Use(corsMiddleware())
 	router.Use(AuthMiddleware())
-
+	gin.SetMode(gin.ReleaseMode)
 	AppConfig := Config.LoadConfiguration("config.json")
 
 	client, err := datos.ConnectDB()
@@ -89,11 +80,13 @@ func main() {
 	}
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
-	constroladorServicio := controllers.NuevoPerfilController(perfilServicio, MyApp)
+	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
+	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
+	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
-	logRepo := logueadores.NewLogeadorRepository()
-	logRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
+	loginRepo := logueadores.NewLogeadorRepository()
+	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
 
 	log.Println("Iniciando servidor en puerto", AppConfig.Port)
 	io := socket.NewServer(nil, nil)
@@ -104,14 +97,16 @@ func main() {
 	router.Any("/socket.io/*any", gin.WrapH(io.ServeHandler(nil)))
 
 	err = io.On("connection", func(clients ...any) {
-		nuevaConexion(clients, *logRepo)
+		nuevaConexion(clients, *loginRepo)
 	})
 	if err != nil {
 		log.Fatalln("Error setting socket.io on connection", "err", err)
 	}
 
-	router.GET("/perfil", constroladorServicio.Get)
-	router.POST("/perfil", constroladorServicio.Post)
+	router.GET("/perfil", constroladorPerfil.Get)
+	router.POST("/perfil", constroladorPerfil.Post)
+	router.GET("/sesiones", constroladorSesiones.Get)
+	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }

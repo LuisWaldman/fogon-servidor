@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	datos "github.com/LuisWaldman/fogon-servidor/datos"
-	db "github.com/LuisWaldman/fogon-servidor/db"
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +27,7 @@ func TestObtenerUsuario(t *testing.T) {
 	// Crea un mock de socket.Socket usando testify/mock o una estructura personalizada
 	// Implementa los métodos necesarios de socket.Socket en mockSocket si es necesario
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoUsuarioServicio(client)
 
@@ -41,7 +40,7 @@ func TestObtenerUsuarioInexistente(t *testing.T) {
 	// Crea un mock de socket.Socket usando testify/mock o una estructura personalizada
 	// Implementa los métodos necesarios de socket.Socket en mockSocket si es necesario
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoUsuarioServicio(client)
 
@@ -51,7 +50,7 @@ func TestObtenerUsuarioInexistente(t *testing.T) {
 }
 func TestCreaYBorra(t *testing.T) {
 
-	client, errDB := db.ConnectDB()
+	client, errDB := datos.ConnectDB()
 	assert.Nil(t, errDB, "Error al crear base de datos: %v", errDB)
 	servicio := NuevoUsuarioServicio(client)
 	nombre := "test_user_" + RandString(8)

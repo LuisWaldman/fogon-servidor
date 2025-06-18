@@ -3,7 +3,7 @@ package servicios
 import (
 	"testing"
 
-	db "github.com/LuisWaldman/fogon-servidor/db"
+	datos "github.com/LuisWaldman/fogon-servidor/datos"
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +18,7 @@ func TestCrearPerfil(t *testing.T) {
 	perfil.Instrumento = "dfgdg"
 	perfil.Descripcion = "fdgfdgdf"
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoPerfilServicio(client)
 	err = servicio.CrearPerfil(*perfil)
@@ -28,7 +28,7 @@ func TestCrearPerfil(t *testing.T) {
 
 func TestTraerPerfilNoExistente(t *testing.T) {
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoPerfilServicio(client)
 
@@ -46,7 +46,7 @@ func TestCrearYBorrarPerfil(t *testing.T) {
 	perfil.Instrumento = "dfgdg"
 	perfil.Descripcion = "fdgfdgdf"
 
-	client, err := db.ConnectDB()
+	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoPerfilServicio(client)
 
