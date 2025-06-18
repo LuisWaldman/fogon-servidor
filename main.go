@@ -70,7 +70,7 @@ func main() {
 	router := gin.Default()
 	router.Use(corsMiddleware())
 	router.Use(AuthMiddleware())
-
+	gin.SetMode(gin.ReleaseMode)
 	AppConfig := Config.LoadConfiguration("config.json")
 
 	client, err := datos.ConnectDB()
