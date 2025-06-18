@@ -49,6 +49,7 @@ func (app *Aplicacion) AgregarMusico(musico *Musico) {
 func (app *Aplicacion) ActualizarSesiones() {
 	for nombre, sesion := range app.sesiones {
 		if len(sesion.musicos) == 0 {
+			log.Println("Eliminando sesion vacia:", nombre)
 			delete(app.sesiones, nombre)
 		}
 	}

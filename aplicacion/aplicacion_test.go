@@ -70,3 +70,28 @@ func TestEliminaSesionesSinUsuarios(t *testing.T) {
 	assert.Equal(t, 0, len(app.sesiones), "Hay sesiones")
 
 }
+
+func TestEliminaSesionesYOtraPideUsuarios(t *testing.T) {
+	app := NuevoAplicacion()
+	loginRepo := logueadores.NewLogeadorRepository()
+	claves := []string{"VALIDA"}
+	loginRepo.Add("TEST", logueadores.NewTesterLogeador(claves))
+	newSocket := &MockSocket{}
+	newSocket2 := &MockSocket{}
+	musico := NuevoMusico(newSocket, *loginRepo)
+	app.AgregarMusico(musico)
+	musico2 := NuevoMusico(newSocket2, *loginRepo)
+	app.AgregarMusico(musico2)
+
+	app.CrearSesion(musico, "sesion", 0, 3.14)
+	assert.Equal(t, 1, len(app.sesiones), "Hay sesiones")
+	app.UnirseSesion(musico2, "sesion")
+
+	musico2.SalirSesion()
+	app.ActualizarSesiones()
+	app.QuitarMusico(musico2)
+	buscaMusico, _ := app.BuscarMusicoPorID(musico.ID)
+	user := buscaMusico.Sesion.GetUsuariosView()
+	assert.Equal(t, 1, len(user), "Hay sesiones")
+
+}

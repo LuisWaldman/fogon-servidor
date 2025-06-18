@@ -22,7 +22,7 @@ func NuevoPerfilController(service *servicios.PerfilServicio, aplicacion *aplica
 
 func (sc *PerfilController) Get(c *gin.Context) {
 	user, _ := c.Get("userID")
-	log.Println("LLEGO A PERFIL GET", "method", c.Request.Method, "path", c.Request.URL.Path, "userID", user)
+	log.Println("LLEGO A PERFIL GET", "userID", user)
 	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int))
 	perfil, _ := sc.service.BuscarPorUsuario(musico.Usuario)
 	musico.NombrePerfil = perfil.Nombre // Associate the profile with the musician
