@@ -2,6 +2,7 @@ package aplicacion
 
 type Sesion struct {
 	nombre   string
+	cancion  string
 	latitud  float64
 	longitud float64
 	musicos  map[int]*Musico
@@ -12,7 +13,13 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 	for _, sesion := range sesion.musicos {
 		sesion.Socket.Emit("mensajesesion", msj)
 	}
+}
 
+func (sesion *Sesion) ActualizarCancion(nmCancion string) {
+	sesion.cancion = nmCancion
+	for _, musico := range sesion.musicos {
+		musico.Socket.Emit("cancionActualizada", sesion.cancion)
+	}
 }
 
 type UsuarioSesionView struct {
@@ -42,7 +49,9 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 
 	}
 	sesion.musicos[musico.ID] = musico
-
+	if sesion.cancion != "" {
+		musico.Socket.Emit("cancionActualizada", sesion.cancion)
+	}
 }
 
 func (app *Sesion) SalirSesion(musico *Musico) {

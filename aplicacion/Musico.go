@@ -59,7 +59,14 @@ func (musico *Musico) MensajeSesion(msj string) {
 		return
 	}
 	musico.Sesion.MensajeSesion(msj)
+}
 
+func (musico *Musico) ActualizarCancion(nmCancion string) {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.ActualizarCancion(nmCancion)
 }
 
 func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
