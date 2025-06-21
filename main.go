@@ -84,6 +84,9 @@ func main() {
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 
+	ntpServicio := servicios.NuevoNTPServicio()
+	constroladorNTP := controllers.NuevoNTPController(ntpServicio)
+
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
 	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
@@ -107,6 +110,7 @@ func main() {
 	router.POST("/perfil", constroladorPerfil.Post)
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
+	router.GET("/ntp", constroladorNTP.Get)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
