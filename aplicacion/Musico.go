@@ -28,8 +28,8 @@ type Musico struct {
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.Sesion = sesion
 	musico.rolSesion = "default" // Default role for a musician
-	sesion.AgregarMusico(musico)
 	musico.emit("ensesion", sesion.nombre)
+	sesion.AgregarMusico(musico)
 }
 
 // SetRolSesion sets the role of the musician in the session
@@ -51,6 +51,30 @@ func (musico *Musico) SalirSesion() {
 	musico.Sesion = nil
 	musico.rolSesion = "default"
 	musico.emit("salirsesion", "You have left the session")
+}
+
+func (musico *Musico) IniciarReproduccion(compas int, delay float64) {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.IniciarReproduccion(compas, delay)
+}
+
+func (musico *Musico) DetenerReproduccion() {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.DetenerReproduccion()
+}
+
+func (musico *Musico) ActualizarCompas(compas int) {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.ActualizarCompas(compas)
 }
 
 func (musico *Musico) MensajeSesion(msj string) {
