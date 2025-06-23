@@ -31,15 +31,17 @@ func NuevoNTPServicio() *NTPServicio {
 }
 
 func (s *NTPServicio) ActualizarHora() {
+	s.horaActual = time.Now()
 	if time.Since(s.ultimoDelta) < time.Minute {
 		return // No actualizar si ya se actualizó en el último minuto
 	}
 	ntpTime, _ := ntp.Time("pool.ntp.org")
+	s.ultimoDelta = ntpTime
 	s.Delta = time.Until(ntpTime)
 }
 
 func (s *NTPServicio) Get() (time.Time, error) {
 
 	go s.ActualizarHora()
-	return s.horaActual.Add(s.Delta), nil
+	return time.Now().Add(s.Delta), nil
 }

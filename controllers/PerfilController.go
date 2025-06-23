@@ -23,7 +23,12 @@ func NuevoPerfilController(service *servicios.PerfilServicio, aplicacion *aplica
 func (sc *PerfilController) Get(c *gin.Context) {
 	user, _ := c.Get("userID")
 	log.Println("LLEGO A PERFIL GET", "userID", user)
-	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int))
+	musico, encuentra := sc.aplicacion.BuscarMusicoPorID(user.(int))
+	if !encuentra {
+		log.Println("No se encontró el músico con ID:", user)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No se encontró el músico"})
+		return
+	}
 	perfil, _ := sc.service.BuscarPorUsuario(musico.Usuario)
 	musico.NombrePerfil = perfil.Nombre // Associate the profile with the musician
 	c.JSON(http.StatusOK, perfil)
