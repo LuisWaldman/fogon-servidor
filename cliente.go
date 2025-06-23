@@ -47,6 +47,14 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}
 	})
 
+	newSocket.On("actualizarCancion", func(datas ...any) {
+		if len(datas) == 1 {
+			nmCancion := datas[0].(string)
+			log.Println("actualizarCancion - actualizarCancion:", nmCancion)
+			newMusico.ActualizarCancion(nmCancion)
+		}
+	})
+
 	newSocket.On("mensajeasesion", func(datas ...any) {
 		if len(datas) == 1 {
 			msj := datas[0].(string)
@@ -54,6 +62,29 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 			newMusico.MensajeSesion(msj)
 		}
 	})
+
+	newSocket.On("iniciarReproduccion", func(datas ...any) {
+		if len(datas) == 2 {
+			compas := datas[0].(float64)
+			delayms := datas[1].(float64)
+			log.Println("iniciarReproduccion - Sesion:", compas, "Delay:", delayms)
+			newMusico.IniciarReproduccion(int(compas), delayms)
+		}
+	})
+
+	newSocket.On("detenerReproduccion", func(datas ...any) {
+		log.Println("detenerReproduccion - Sesion:")
+		newMusico.DetenerReproduccion()
+	})
+
+	newSocket.On("actualizarCompas", func(datas ...any) {
+		if len(datas) == 1 {
+			compas := datas[0].(float64)
+			log.Println("iniciarReproduccion - Sesion:", compas)
+			newMusico.ActualizarCompas(int(compas))
+		}
+	})
+
 	newSocket.On("disconnect", func(...any) {
 		newMusico.SalirSesion()
 		MyApp.ActualizarSesiones()

@@ -1,18 +1,62 @@
 package aplicacion
 
+import (
+	"log"
+	"time"
+
+	servicios "github.com/LuisWaldman/fogon-servidor/servicios" // Adjust the import path as necessary
+)
+
 type Sesion struct {
 	nombre   string
+	cancion  string
 	latitud  float64
 	longitud float64
 	musicos  map[int]*Musico
 	estado   string
+	inicio   time.Time
+	compas   int
 }
 
 func (sesion *Sesion) MensajeSesion(msj string) {
-	for _, sesion := range sesion.musicos {
-		sesion.Socket.Emit("mensajesesion", msj)
+	for _, musicos := range sesion.musicos {
+		musicos.emit("mensajesesion", msj)
+	}
+}
+
+func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
+	NTPServicio := servicios.NuevoNTPServicio()
+	sesion.compas = compas
+	hora, _ := NTPServicio.Get()
+	sesion.estado = "reproduciendo"
+
+	sesion.inicio = hora.Add(time.Duration(delay) * 1000 * time.Millisecond)
+	log.Print("Hora: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
+	for _, musico := range sesion.musicos {
+		musico.emit("cancionIniciada", compas, sesion.inicio.Format("2006-01-02 15:04:05.000"))
+	}
+}
+
+func (sesion *Sesion) DetenerReproduccion() {
+	for _, musico := range sesion.musicos {
+		musico.emit("cancionDetenida")
+		sesion.estado = "pausada"
 	}
 
+}
+
+func (sesion *Sesion) ActualizarCompas(compas int) {
+	sesion.compas = compas
+	for _, musico := range sesion.musicos {
+		musico.emit("compasActualizado", compas)
+	}
+}
+
+func (sesion *Sesion) ActualizarCancion(nmCancion string) {
+	sesion.cancion = nmCancion
+	for _, musico := range sesion.musicos {
+		musico.Socket.Emit("cancionActualizada", sesion.cancion)
+	}
 }
 
 type UsuarioSesionView struct {
@@ -42,7 +86,12 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 
 	}
 	sesion.musicos[musico.ID] = musico
-
+	if sesion.cancion != "" {
+		musico.Socket.Emit("cancionActualizada", sesion.cancion)
+	}
+	if sesion.estado == "reproduciendo" {
+		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio.Format("2006-01-02 15:04:05.000"))
+	}
 }
 
 func (app *Sesion) SalirSesion(musico *Musico) {

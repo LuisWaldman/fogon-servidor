@@ -19,7 +19,12 @@ func NuevoUsuariosSesion(aplicacion *aplicacion.Aplicacion) *UsuariosSesion {
 func (sc *UsuariosSesion) Get(c *gin.Context) {
 	user, _ := c.Get("userID")
 	log.Println("LLEGO A USUARIOS GET", "method", c.Request.Method, "path", c.Request.URL.Path, "userID", user)
-	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int))
+	musico, encuentra := sc.aplicacion.BuscarMusicoPorID(user.(int))
+	if !encuentra {
+		log.Println("No se encontró el músico con ID:", user)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No se encontró el músico"})
+		return
+	}
 	if !musico.TieneSesion() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No tienes una sesión activa"})
 		return
