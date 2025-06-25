@@ -41,6 +41,11 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		if c.Request.Method == "GET" && c.Request.URL.Path == "/ntp" {
+			c.Next()
+			return
+		}
+
 		// Obtener el token del header Authorization
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
