@@ -30,7 +30,7 @@ func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
 	hora, _ := NTPServicio.Get()
 	sesion.estado = "reproduciendo"
 
-	sesion.inicio = hora.Add(time.Duration(delay) * 1000 * time.Millisecond)
+	sesion.inicio = hora.Add(time.Duration(delay*1000) * time.Millisecond)
 	log.Print("Hora: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
 	for _, musico := range sesion.musicos {
 		musico.emit("cancionIniciada", compas, sesion.inicio.Format("2006-01-02 15:04:05.000"))
