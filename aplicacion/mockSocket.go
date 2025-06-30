@@ -24,6 +24,15 @@ func (m *MockSocket) UltimoEmitted() *EmittedEvent {
 	return &m.Events[len(m.Events)-1]
 }
 
+func (m *MockSocket) TieneMensaje(event string) bool {
+	for _, e := range m.Events {
+		if e.Event == event {
+			return true
+		}
+	}
+	return false
+}
+
 func (m *MockSocket) ListaEvents() []EmittedEvent {
 	return m.Events
 }

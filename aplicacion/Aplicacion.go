@@ -91,8 +91,8 @@ func (app *Aplicacion) CrearSesion(musico *Musico, sesion string, latitud float6
 func (app *Aplicacion) UnirseSesion(musico *Musico, sesion string) {
 	// Check if the session already exists
 	if _, exists := app.sesiones[sesion]; !exists {
-		app.CrearSesion(musico, sesion, 0.0, 0.0)
-
+		musico.Socket.Emit("sesionFailed", "La sesion no existe")
+		return
 	}
 	musico.UnirseSesion(app.sesiones[sesion])
 }

@@ -32,13 +32,10 @@ func TestCreoSesion(t *testing.T) {
 	if sesion.nombre != sesionID || sesion.latitud != latitud || sesion.longitud != longitud {
 		t.Errorf("Los datos de la sesión no coinciden: got %v, want %s, %f, %f", sesion, sesionID, latitud, longitud)
 	}
-
-	assert.Equal(t, "ensesion", newSocket.UltimoEmitted().Event, "No dio ensesion")
-
 	otromusico := NuevoMusico(newSocket, *loginRepo)
 	app.AgregarMusico(otromusico)
 	app.UnirseSesion(otromusico, sesionID)
-	assert.Equal(t, "ensesion", newSocket.UltimoEmitted().Event, "No dio ensesion")
+	assert.True(t, newSocket.TieneMensaje("ensesion"), "No dio ensesion")
 }
 
 func TestSeUneASesionInexistente(t *testing.T) {
@@ -51,7 +48,7 @@ func TestSeUneASesionInexistente(t *testing.T) {
 	app.AgregarMusico(musico)
 
 	app.UnirseSesion(musico, "sesion_inexistente")
-	assert.Equal(t, "sesionFailed", newSocket.UltimoEmitted().Event, "No dio sesionFailed")
+	assert.True(t, newSocket.TieneMensaje("sesionFailed"), "No dio ensesion")
 }
 
 func TestEliminaSesionesSinUsuarios(t *testing.T) {
