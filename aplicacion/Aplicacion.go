@@ -44,6 +44,7 @@ func (app *Aplicacion) AgregarMusico(musico *Musico) {
 	}
 	musico.ID = len(app.musicos) + 1 // Assign a new ID based on the current size of the map
 	app.musicos[musico.ID] = musico
+	musico.GenerarToken()
 }
 
 func (app *Aplicacion) ActualizarSesiones() {

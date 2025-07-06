@@ -110,7 +110,7 @@ func (musico *Musico) GenerarToken() {
 		musico.emit("loginFailed", "Failed to generate token")
 		return
 	}
-	err = musico.emit("conectado", map[string]string{"token": tokenString})
+	musico.emit("conectado", map[string]string{"token": tokenString})
 }
 
 func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
