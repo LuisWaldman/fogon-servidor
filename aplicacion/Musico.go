@@ -93,11 +93,7 @@ func (musico *Musico) ActualizarCancion(nmCancion string) {
 	musico.Sesion.ActualizarCancion(nmCancion)
 }
 
-func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
-	if !musico.logRepo.Login(modo, par_1, par_2) {
-		musico.emit("loginFailed", "Failed to generate token")
-		return
-	}
+func (musico *Musico) GenerarToken() {
 
 	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
 	claims := &jwt.RegisteredClaims{
@@ -114,9 +110,16 @@ func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
 		musico.emit("loginFailed", "Failed to generate token")
 		return
 	}
+	musico.emit("conectado", map[string]string{"token": tokenString})
+}
 
+func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
+	if !musico.logRepo.Login(modo, par_1, par_2) {
+		musico.emit("loginFailed", "Failed to generate token")
+		return
+	}
 	musico.Usuario = par_1 // Assuming par_1 is the username or identifier
-	err = musico.emit("loginSuccess", map[string]string{"token": tokenString})
+	err := musico.emit("loginSuccess", "")
 	if err != nil {
 		fmt.Println("Error sending token:", err)
 	}

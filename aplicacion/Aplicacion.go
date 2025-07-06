@@ -44,6 +44,7 @@ func (app *Aplicacion) AgregarMusico(musico *Musico) {
 	}
 	musico.ID = len(app.musicos) + 1 // Assign a new ID based on the current size of the map
 	app.musicos[musico.ID] = musico
+	musico.GenerarToken()
 }
 
 func (app *Aplicacion) ActualizarSesiones() {
@@ -78,21 +79,26 @@ func (app *Aplicacion) CrearSesion(musico *Musico, sesion string, latitud float6
 	}
 
 	// Create a new session
-	newSesion := &Sesion{
-		nombre:   sesion,
-		latitud:  latitud,
-		longitud: longitud,
-	}
+	newSesion := NuevaSesion(sesion)
 	app.sesiones[sesion] = newSesion
 	app.UnirseSesion(musico, sesion)
+	app.NotificarActualizarSesion()
+}
 
+func (app *Aplicacion) NotificarActualizarSesion() {
+	// Check if the session already exists
+	for _, musico := range app.musicos {
+		if musico != nil && musico.Socket != nil {
+			musico.Socket.Emit("sesionesActualizadas", nil)
+		}
+	}
 }
 
 func (app *Aplicacion) UnirseSesion(musico *Musico, sesion string) {
 	// Check if the session already exists
 	if _, exists := app.sesiones[sesion]; !exists {
-		app.CrearSesion(musico, sesion, 0.0, 0.0)
-
+		musico.Socket.Emit("sesionFailed", "La sesion no existe")
+		return
 	}
 	musico.UnirseSesion(app.sesiones[sesion])
 }

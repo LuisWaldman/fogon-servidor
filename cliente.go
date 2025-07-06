@@ -37,6 +37,7 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	newSocket.On("salirsesion", func(datas ...any) {
 		newMusico.SalirSesion()
 		MyApp.ActualizarSesiones()
+		MyApp.NotificarActualizarSesion()
 	})
 
 	newSocket.On("unirmesesion", func(datas ...any) {
