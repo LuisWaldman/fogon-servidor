@@ -20,9 +20,7 @@ func TestSesionMensaje(t *testing.T) {
 	newMusico.ID = 123  // Asigna un ID al usuario para la prueba
 	newMusico2.ID = 423 // Asigna un ID al usuario para la prueba
 
-	sesion := &Sesion{
-		nombre: "TestSession",
-	}
+	sesion := NuevaSesion("TestSession")
 	newMusico.UnirseSesion(sesion)
 	newMusico2.UnirseSesion(sesion)
 	// Obtén el token emitido
@@ -51,9 +49,7 @@ func TestQuedaDirector(t *testing.T) {
 	newMusico.ID = 123  // Asigna un ID al usuario para la prueba
 	newMusico2.ID = 423 // Asigna un ID al usuario para la prueba
 
-	sesion := &Sesion{
-		nombre: "TestSession",
-	}
+	sesion := NuevaSesion("TestSession")
 	newMusico.UnirseSesion(sesion)
 	newMusico2.UnirseSesion(sesion)
 	newMusico.SalirSesion()

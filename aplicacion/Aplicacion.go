@@ -79,14 +79,19 @@ func (app *Aplicacion) CrearSesion(musico *Musico, sesion string, latitud float6
 	}
 
 	// Create a new session
-	newSesion := &Sesion{
-		nombre:   sesion,
-		latitud:  latitud,
-		longitud: longitud,
-	}
+	newSesion := NuevaSesion(sesion)
 	app.sesiones[sesion] = newSesion
 	app.UnirseSesion(musico, sesion)
+	app.NotificarActualizarSesion()
+}
 
+func (app *Aplicacion) NotificarActualizarSesion() {
+	// Check if the session already exists
+	for _, musico := range app.musicos {
+		if musico != nil && musico.Socket != nil {
+			musico.Socket.Emit("sesionesActualizadas", nil)
+		}
+	}
 }
 
 func (app *Aplicacion) UnirseSesion(musico *Musico, sesion string) {

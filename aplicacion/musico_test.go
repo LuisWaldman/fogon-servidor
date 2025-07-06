@@ -50,9 +50,7 @@ func TestTieneSesion(t *testing.T) {
 	newSocket := &MockSocket{}
 	newMusico := NuevoMusico(newSocket, *loginRepo)
 	newMusico.ID = 123 // Asigna un ID al usuario para la prueba
-	sesion := &Sesion{
-		nombre: "TestSession",
-	}
+	sesion := NuevaSesion("TestSession")
 	assert.False(t, newMusico.TieneSesion(), "El músico no debería tener una sesión activa al inicio")
 	newMusico.UnirseSesion(sesion)
 	assert.True(t, newMusico.TieneSesion(), "El músico  debería tener una sesión activa")

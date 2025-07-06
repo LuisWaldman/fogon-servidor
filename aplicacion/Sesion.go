@@ -2,6 +2,7 @@ package aplicacion
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	servicios "github.com/LuisWaldman/fogon-servidor/servicios" // Adjust the import path as necessary
@@ -16,12 +17,23 @@ type Sesion struct {
 	estado   string
 	inicio   time.Time
 	compas   int
+	Mutex    *sync.Mutex
+}
+
+func NuevaSesion(nombre string) *Sesion {
+	return &Sesion{
+		nombre:  nombre,
+		musicos: make(map[int]*Musico),
+		Mutex:   &sync.Mutex{},
+	}
 }
 
 func (sesion *Sesion) MensajeSesion(msj string) {
+	sesion.Mutex.Lock()
 	for _, musicos := range sesion.musicos {
 		musicos.emit("mensajesesion", msj)
 	}
+	sesion.Mutex.Unlock()
 }
 
 func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
@@ -31,32 +43,41 @@ func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
 	sesion.estado = "reproduciendo"
 
 	sesion.inicio = hora.Add(time.Duration(delay*1000) * time.Millisecond)
-	log.Print("Hora: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
+	log.Print("Hora para tomar: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
+	sesion.Mutex.Lock()
+	log.Print("Hora toma: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
 	for _, musico := range sesion.musicos {
 		musico.emit("cancionIniciada", compas, sesion.inicio.Format("2006-01-02 15:04:05.000"))
 	}
+	sesion.Mutex.Unlock()
 }
 
 func (sesion *Sesion) DetenerReproduccion() {
+	sesion.Mutex.Lock()
 	for _, musico := range sesion.musicos {
 		musico.emit("cancionDetenida")
 		sesion.estado = "pausada"
 	}
+	sesion.Mutex.Unlock()
 
 }
 
 func (sesion *Sesion) ActualizarCompas(compas int) {
 	sesion.compas = compas
+	sesion.Mutex.Lock()
 	for _, musico := range sesion.musicos {
 		musico.emit("compasActualizado", compas)
 	}
+	sesion.Mutex.Unlock()
 }
 
 func (sesion *Sesion) ActualizarCancion(nmCancion string) {
 	sesion.cancion = nmCancion
+	sesion.Mutex.Lock()
 	for _, musico := range sesion.musicos {
 		musico.Socket.Emit("cancionActualizada", sesion.cancion)
 	}
+	sesion.Mutex.Unlock()
 }
 
 type UsuarioSesionView struct {
@@ -67,6 +88,7 @@ type UsuarioSesionView struct {
 
 func (sesion *Sesion) GetUsuariosView() []UsuarioSesionView {
 	usuarios := make([]UsuarioSesionView, 0, len(sesion.musicos))
+	sesion.Mutex.Lock()
 	for _, musico := range sesion.musicos {
 		usuarios = append(usuarios, UsuarioSesionView{
 			Usuario:      musico.Usuario,
@@ -74,8 +96,10 @@ func (sesion *Sesion) GetUsuariosView() []UsuarioSesionView {
 			RolSesion:    musico.rolSesion,
 		})
 	}
+	sesion.Mutex.Unlock()
 	return usuarios
 }
+
 func (sesion *Sesion) AgregarMusico(musico *Musico) {
 	if musico == nil {
 		return
@@ -94,21 +118,25 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 	}
 }
 
-func (app *Sesion) SalirSesion(musico *Musico) {
+func (sesion *Sesion) SalirSesion(musico *Musico) {
 	if musico == nil {
 		return
 	}
-	delete(app.musicos, musico.ID)
-	if len(app.musicos) > 0 {
-		for _, m := range app.musicos {
+	sesion.Mutex.Lock()
+	delete(sesion.musicos, musico.ID)
+	if len(sesion.musicos) > 0 {
+		for _, m := range sesion.musicos {
 			if m.rolSesion == "director" {
+				sesion.Mutex.Unlock()
 				return // Al menos un director sigue en la sesión
 			}
 		}
 		// Si no hay directores, el primero se convierte en director
-		for _, m := range app.musicos {
+		for _, m := range sesion.musicos {
 			m.SetRolSesion("director")
+			sesion.Mutex.Unlock()
 			return
 		}
 	}
+	sesion.Mutex.Unlock()
 }
