@@ -5,6 +5,7 @@ import (
 
 	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
 	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
+	"github.com/LuisWaldman/fogon-servidor/servicios"
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
@@ -12,6 +13,9 @@ func LoginUser(datas ...any) {
 }
 
 func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
+
+	ntpServicio := servicios.NuevoNTPServicio()
+	go ntpServicio.ActualizarHora()
 	newSocket := clients[0].(*socket.Socket)
 	newMusico := aplicacion.NuevoMusico(newSocket, logRepo)
 	MyApp.AgregarMusico(newMusico)
@@ -24,6 +28,10 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 			log.Println("LOGIN - Modo:", modo, "par_1:", par_1, "par_2:", par_2)
 			newMusico.Login(modo, par_1, par_2)
 		}
+	})
+	newSocket.On("gettime", func(datas ...any) {
+		hora, _ := servicios.NuevoNTPServicio().Get()
+		newMusico.Socket.Emit("time", hora.Format("2006-01-02 15:04:05.000"))
 	})
 	newSocket.On("crearsesion", func(datas ...any) {
 		if len(datas) == 3 {
