@@ -47,7 +47,7 @@ func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
 	sesion.Mutex.Lock()
 	log.Print("Hora toma: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
 	for _, musico := range sesion.musicos {
-		musico.emit("cancionIniciada", compas, sesion.inicio.Format("2006-01-02 15:04:05.000"))
+		musico.emit("cancionIniciada", compas, sesion.inicio.Format("2006-01-02T15:04:05.000Z"))
 	}
 	sesion.Mutex.Unlock()
 }
