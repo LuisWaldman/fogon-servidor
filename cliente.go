@@ -31,7 +31,7 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	})
 	newSocket.On("gettime", func(datas ...any) {
 		hora, _ := servicios.NuevoNTPServicio().Get()
-		newMusico.Socket.Emit("time", hora.Format("2006-01-02 15:04:05.000"))
+		newMusico.Socket.Emit("time", hora.UTC().Format("2006-01-02T15:04:05.000Z"))
 	})
 	newSocket.On("crearsesion", func(datas ...any) {
 		if len(datas) == 3 {
