@@ -114,7 +114,7 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 		musico.Socket.Emit("cancionActualizada", sesion.cancion)
 	}
 	if sesion.estado == "reproduciendo" {
-		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio.Format("2006-01-02 15:04:05.000"))
+		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio.Format("2006-01-02T15:04:05.000Z"))
 	}
 }
 
