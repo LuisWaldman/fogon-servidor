@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
@@ -16,10 +17,12 @@ import (
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
+var AppConfig = Config.LoadConfiguration()
+
 func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
-		c.Header("Access-Control-Allow-Origin", "https://www.fogon.ar")
+		c.Header("Access-Control-Allow-Origin", AppConfig.Site)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
@@ -72,11 +75,12 @@ func AuthMiddleware() gin.HandlerFunc {
 var MyApp = aplicacion.NuevoAplicacion()
 
 func main() {
+	log.Println(os.Getenv("ENV"), "Iniciando servidor Fogon")
+	return
 	router := gin.Default()
 	router.Use(corsMiddleware())
 	router.Use(AuthMiddleware())
 	gin.SetMode(gin.ReleaseMode)
-	AppConfig := Config.LoadConfiguration("config.json")
 
 	client, err := datos.ConnectDB()
 	if err != nil {
