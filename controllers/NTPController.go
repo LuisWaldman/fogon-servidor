@@ -21,5 +21,5 @@ func (sc *NTPController) Get(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Error al obtener la hora"})
 		return
 	}
-	c.JSON(200, gin.H{"hora": hora.Format("2006-01-02 15:04:05.000")})
+	c.JSON(200, gin.H{"hora": hora.Format("2006-01-02T15:04:05.000Z")})
 }
