@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
@@ -75,8 +74,6 @@ func AuthMiddleware() gin.HandlerFunc {
 var MyApp = aplicacion.NuevoAplicacion()
 
 func main() {
-	log.Println(os.Getenv("ENV"), "Iniciando servidor Fogon")
-	return
 	router := gin.Default()
 	router.Use(corsMiddleware())
 	router.Use(AuthMiddleware())
