@@ -39,7 +39,7 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
 	NTPServicio := servicios.NuevoNTPServicio()
 	sesion.compas = compas
-	hora, _ := NTPServicio.Get()
+	hora := NTPServicio.Get()
 	sesion.estado = "reproduciendo"
 
 	sesion.inicio = hora.Add(time.Duration(delay*1000) * time.Millisecond)

@@ -14,8 +14,8 @@ func LoginUser(datas ...any) {
 
 func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 
-	ntpServicio := servicios.NuevoNTPServicio()
-	go ntpServicio.ActualizarHora()
+	//ntpServicio := servicios.NuevoNTPServicio()
+	//go ntpServicio.ActualizarHora()
 	newSocket := clients[0].(*socket.Socket)
 	newMusico := aplicacion.NuevoMusico(newSocket, logRepo)
 	MyApp.AgregarMusico(newMusico)
@@ -30,7 +30,7 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}
 	})
 	newSocket.On("gettime", func(datas ...any) {
-		hora, _ := servicios.NuevoNTPServicio().Get()
+		hora := servicios.NuevoNTPServicio().Get()
 		newMusico.Socket.Emit("time", hora.UTC().Format("2006-01-02T15:04:05.000Z"))
 	})
 	newSocket.On("crearsesion", func(datas ...any) {
