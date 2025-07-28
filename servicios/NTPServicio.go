@@ -3,8 +3,6 @@ package servicios
 import (
 	"sync"
 	"time"
-
-	"github.com/beevik/ntp"
 )
 
 var (
@@ -25,23 +23,24 @@ func NuevoNTPServicio() *NTPServicio {
 			horaActual:  time.Now(),
 			Delta:       0,
 		}
-		go ntpServicioInstance.ActualizarHora()
+		//go ntpServicioInstance.ActualizarHora()
 	})
 	return ntpServicioInstance
 }
 
-func (s *NTPServicio) ActualizarHora() {
-	s.horaActual = time.Now()
-	if time.Since(s.ultimoDelta) < time.Minute {
-		return // No actualizar si ya se actualizó en el último minuto
+/*
+	func (s *NTPServicio) ActualizarHora() {
+		s.horaActual = time.Now()
+		if time.Since(s.ultimoDelta) < time.Minute {
+			return // No actualizar si ya se actualizó en el último minuto
+		}
+		ntpTime, _ := ntp.Time("pool.ntp.org")
+		s.ultimoDelta = ntpTime
+		s.Delta = time.Until(ntpTime)
 	}
-	ntpTime, _ := ntp.Time("pool.ntp.org")
-	s.ultimoDelta = ntpTime
-	s.Delta = time.Until(ntpTime)
-}
+*/
+func (s *NTPServicio) Get() time.Time {
 
-func (s *NTPServicio) Get() (time.Time, error) {
-
-	go s.ActualizarHora()
-	return time.Now().Add(s.Delta), nil
+	//go s.ActualizarHora()
+	return time.Now()
 }
