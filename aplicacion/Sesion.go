@@ -4,8 +4,7 @@ import (
 	"log"
 	"sync"
 	"time"
-
-	servicios "github.com/LuisWaldman/fogon-servidor/servicios" // Adjust the import path as necessary
+	// Adjust the import path as necessary
 )
 
 type Sesion struct {
@@ -15,7 +14,7 @@ type Sesion struct {
 	longitud float64
 	musicos  map[int]*Musico
 	estado   string
-	inicio   time.Time
+	inicio   float64
 	compas   int
 	Mutex    *sync.Mutex
 }
@@ -37,17 +36,21 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 }
 
 func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
-	NTPServicio := servicios.NuevoNTPServicio()
 	sesion.compas = compas
-	hora := NTPServicio.Get()
 	sesion.estado = "reproduciendo"
 
-	sesion.inicio = hora.Add(time.Duration(delay*1000) * time.Millisecond)
-	log.Print("Hora para tomar: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
+	now := time.Now()
+	_, min, sec := now.Clock()
+	nsec := now.Nanosecond()
+	elapsedMicrosSinceHourStart := (((min*60 + sec) * 1000000) + (nsec / 1000)) / 1000
+	time := float64(elapsedMicrosSinceHourStart)
+
+	sesion.inicio = time + delay
+	log.Print("Hora para tomar: ", time, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
 	sesion.Mutex.Lock()
-	log.Print("Hora toma: ", hora, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
+	log.Print("Hora toma: ", time, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
 	for _, musico := range sesion.musicos {
-		musico.emit("cancionIniciada", compas, sesion.inicio.Format("2006-01-02T15:04:05.000Z"))
+		musico.emit("cancionIniciada", compas, sesion.inicio)
 	}
 	sesion.Mutex.Unlock()
 }
@@ -114,7 +117,7 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 		musico.Socket.Emit("cancionActualizada", sesion.cancion)
 	}
 	if sesion.estado == "reproduciendo" {
-		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio.Format("2006-01-02T15:04:05.000Z"))
+		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio)
 	}
 }
 

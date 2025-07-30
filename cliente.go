@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
+	"time"
 
 	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
 	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
-	"github.com/LuisWaldman/fogon-servidor/servicios"
 	"github.com/zishang520/socket.io/v2/socket"
 )
 
@@ -13,9 +13,6 @@ func LoginUser(datas ...any) {
 }
 
 func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
-
-	//ntpServicio := servicios.NuevoNTPServicio()
-	//go ntpServicio.ActualizarHora()
 	newSocket := clients[0].(*socket.Socket)
 	newMusico := aplicacion.NuevoMusico(newSocket, logRepo)
 	MyApp.AgregarMusico(newMusico)
@@ -30,8 +27,12 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}
 	})
 	newSocket.On("gettime", func(datas ...any) {
-		hora := servicios.NuevoNTPServicio().Get()
-		newMusico.Socket.Emit("time", hora.UTC().Format("2006-01-02T15:04:05.000Z"))
+		now := time.Now()
+		_, min, sec := now.Clock()
+		nsec := now.Nanosecond()
+		elapsedMicrosSinceHourStart := ((min*60 + sec) * 1000000) + (nsec / 1000)
+		time := int(elapsedMicrosSinceHourStart / 1000) // Convert to milliseconds
+		newMusico.Socket.Emit("time", time)
 	})
 	newSocket.On("crearsesion", func(datas ...any) {
 		if len(datas) == 3 {
