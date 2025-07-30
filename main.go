@@ -90,6 +90,9 @@ func main() {
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 
+	cancionServicio := servicios.NuevoCancionServicio(client)
+	constroladorCancion := controllers.NuevoCancionController(cancionServicio)
+
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
 	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
@@ -113,6 +116,8 @@ func main() {
 	router.POST("/perfil", constroladorPerfil.Post)
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
+	router.GET("/cancion", constroladorCancion.Get)
+	router.POST("/cancion", constroladorCancion.Post)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
