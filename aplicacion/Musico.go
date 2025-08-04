@@ -49,9 +49,11 @@ func (musico *Musico) SalirSesion() {
 		return
 	}
 	musico.Sesion.SalirSesion(musico)
+	musico.Sesion.ActualizarUsuarios()
+
 	musico.Sesion = nil
 	musico.rolSesion = "default"
-	musico.emit("salirsesion", "You have left the session")
+
 }
 
 func (musico *Musico) IniciarReproduccion(compas int, delay float64) {

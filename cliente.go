@@ -96,6 +96,7 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	})
 
 	newSocket.On("disconnect", func(...any) {
+		log.Println("Musico desconectado:", newMusico.ID)
 		newMusico.SalirSesion()
 		MyApp.ActualizarSesiones()
 		MyApp.QuitarMusico(newMusico)

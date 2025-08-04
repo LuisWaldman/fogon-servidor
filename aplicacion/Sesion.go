@@ -39,6 +39,7 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 
 func (sesion *Sesion) ActualizarUsuarios() {
 	sesion.Mutex.Lock()
+	println("Actualizando usuarios en la sesión:", sesion.nombre)
 	for _, musicos := range sesion.musicos {
 		musicos.emit("actualizarusuarios")
 	}
@@ -154,5 +155,4 @@ func (sesion *Sesion) SalirSesion(musico *Musico) {
 		}
 	}
 	sesion.Mutex.Unlock()
-	sesion.ActualizarUsuarios()
 }
