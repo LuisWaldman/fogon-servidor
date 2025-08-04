@@ -101,4 +101,5 @@ func (app *Aplicacion) UnirseSesion(musico *Musico, sesion string) {
 		return
 	}
 	musico.UnirseSesion(app.sesiones[sesion])
+	app.sesiones[sesion].ActualizarUsuarios()
 }

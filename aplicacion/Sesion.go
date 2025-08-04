@@ -37,6 +37,14 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 	sesion.Mutex.Unlock()
 }
 
+func (sesion *Sesion) ActualizarUsuarios() {
+	sesion.Mutex.Lock()
+	for _, musicos := range sesion.musicos {
+		musicos.emit("actualizarusuarios")
+	}
+	sesion.Mutex.Unlock()
+}
+
 func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
 	sesion.compas = compas
 	sesion.estado = "reproduciendo"
@@ -146,4 +154,5 @@ func (sesion *Sesion) SalirSesion(musico *Musico) {
 		}
 	}
 	sesion.Mutex.Unlock()
+	sesion.ActualizarUsuarios()
 }
