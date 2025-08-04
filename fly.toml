@@ -1,0 +1,6 @@
+[http_service]
+  internal_port = 8080
+  auto_stop_machines = "stop"
+  auto_start_machines = false
+[env]
+  LOG_LEVEL = "debug"

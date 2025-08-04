@@ -84,6 +84,7 @@ func main() {
 		log.Fatalln("Error al conectar a la base de datos:", err)
 		return
 	}
+	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
