@@ -42,7 +42,14 @@ func (app *Aplicacion) AgregarMusico(musico *Musico) {
 	if musico == nil {
 		return
 	}
-	musico.ID = len(app.musicos) + 1 // Assign a new ID based on the current size of the map
+	// Find the maximum ID in the existing musicians
+	maxID := 0
+	for id := range app.musicos {
+		if id > maxID {
+			maxID = id
+		}
+	}
+	musico.ID = maxID + 1 // Assign a new ID based on the current size of the map
 	app.musicos[musico.ID] = musico
 	musico.GenerarToken()
 }
@@ -101,4 +108,5 @@ func (app *Aplicacion) UnirseSesion(musico *Musico, sesion string) {
 		return
 	}
 	musico.UnirseSesion(app.sesiones[sesion])
+	app.sesiones[sesion].ActualizarUsuarios()
 }

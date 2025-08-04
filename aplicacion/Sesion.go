@@ -4,6 +4,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"github.com/LuisWaldman/fogon-servidor/modelo"
 	// Adjust the import path as necessary
 )
 
@@ -31,6 +33,15 @@ func (sesion *Sesion) MensajeSesion(msj string) {
 	sesion.Mutex.Lock()
 	for _, musicos := range sesion.musicos {
 		musicos.emit("mensajesesion", msj)
+	}
+	sesion.Mutex.Unlock()
+}
+
+func (sesion *Sesion) ActualizarUsuarios() {
+	sesion.Mutex.Lock()
+	println("Actualizando usuarios en la sesión:", sesion.nombre)
+	for _, musicos := range sesion.musicos {
+		musicos.emit("actualizarusuarios")
 	}
 	sesion.Mutex.Unlock()
 }
@@ -84,9 +95,10 @@ func (sesion *Sesion) ActualizarCancion(nmCancion string) {
 }
 
 type UsuarioSesionView struct {
-	Usuario      string `bson:"usuario"`
-	NombrePerfil string `bson:"nombre_perfil"`
-	RolSesion    string `bson:"rol_sesion"`
+	ID        int    `bson:"id"`
+	Usuario   string `bson:"usuario"`
+	Perfil    *modelo.Perfil
+	RolSesion string `bson:"rolSesion"`
 }
 
 func (sesion *Sesion) GetUsuariosView() []UsuarioSesionView {
@@ -94,9 +106,10 @@ func (sesion *Sesion) GetUsuariosView() []UsuarioSesionView {
 	sesion.Mutex.Lock()
 	for _, musico := range sesion.musicos {
 		usuarios = append(usuarios, UsuarioSesionView{
-			Usuario:      musico.Usuario,
-			NombrePerfil: musico.NombrePerfil,
-			RolSesion:    musico.rolSesion,
+			ID:        musico.ID,
+			Perfil:    musico.Perfil,
+			Usuario:   musico.Usuario,
+			RolSesion: musico.rolSesion,
 		})
 	}
 	sesion.Mutex.Unlock()

@@ -84,6 +84,7 @@ func main() {
 		log.Fatalln("Error al conectar a la base de datos:", err)
 		return
 	}
+	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
@@ -114,6 +115,7 @@ func main() {
 
 	router.GET("/perfil", constroladorPerfil.Get)
 	router.POST("/perfil", constroladorPerfil.Post)
+
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
 	router.GET("/cancion", constroladorCancion.Get)
