@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
+	"github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -16,13 +17,13 @@ type Emitter interface {
 }
 
 type Musico struct {
-	ID           int
-	Usuario      string
-	Socket       Emitter
-	logRepo      logueadores.LogeadorRepository
-	NombrePerfil string
-	Sesion       *Sesion
-	rolSesion    string
+	ID        int
+	Usuario   string
+	Socket    Emitter
+	logRepo   logueadores.LogeadorRepository
+	Sesion    *Sesion
+	Perfil    *modelo.Perfil
+	rolSesion string
 }
 
 func (musico *Musico) UnirseSesion(sesion *Sesion) {

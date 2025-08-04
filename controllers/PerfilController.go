@@ -30,7 +30,7 @@ func (sc *PerfilController) Get(c *gin.Context) {
 		return
 	}
 	perfil, _ := sc.service.BuscarPorUsuario(musico.Usuario)
-	musico.NombrePerfil = perfil.Nombre // Associate the profile with the musician
+	musico.Perfil = perfil // Associate the profile with the musician
 	c.JSON(http.StatusOK, perfil)
 }
 
@@ -45,9 +45,8 @@ func (sc *PerfilController) Post(c *gin.Context) {
 	log.Println("LLEGO A PERFIL POST", "method", c.Request.Method, "path", c.Request.URL.Path, "userID", user)
 	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int)) // Ensure user is of type string
 	perfil.Usuario = musico.Usuario                          // Set the user for the profile
-	musico.NombrePerfil = perfil.Nombre                      // Associate the profile with the musician
-
 	sc.service.CrearPerfil(perfil)
+	musico.Perfil = &perfil // Associate the profile with the musician
 	c.JSON(http.StatusCreated, gin.H{"message": "Perfil creado exitosamente"})
 
 }

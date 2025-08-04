@@ -114,6 +114,7 @@ func main() {
 
 	router.GET("/perfil", constroladorPerfil.Get)
 	router.POST("/perfil", constroladorPerfil.Post)
+
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
 	router.GET("/cancion", constroladorCancion.Get)
