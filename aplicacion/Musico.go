@@ -133,6 +133,11 @@ func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository) *Musico
 		ID:      0, // Default ID, should be set after login
 		Socket:  socket,
 		logRepo: logRepo,
+		Sesion:  nil,
+		Perfil: &modelo.Perfil{
+			Imagen: "",
+			Nombre: "No Cargado",
+		},
 	}
 }
 
