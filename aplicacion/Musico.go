@@ -88,12 +88,12 @@ func (musico *Musico) MensajeSesion(msj string) {
 	musico.Sesion.MensajeSesion(msj)
 }
 
-func (musico *Musico) ActualizarCancion(nmCancion string) {
+func (musico *Musico) ActualizarCancion(nmCancion string, nmOrigenCancion string, usuarioorigenCancion string) {
 	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
-	musico.Sesion.ActualizarCancion(nmCancion)
+	musico.Sesion.ActualizarCancion(nmCancion, nmOrigenCancion, usuarioorigenCancion)
 }
 
 func (musico *Musico) GenerarToken() {
