@@ -26,6 +26,13 @@ type Musico struct {
 	rolSesion string
 }
 
+func (musico *Musico) ActualizarPerfil(perfil *modelo.Perfil) {
+	musico.Perfil = perfil
+	if musico.Sesion != nil {
+		musico.Sesion.ActualizarUsuarios()
+	}
+}
+
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.Sesion = sesion
 	musico.rolSesion = "default" // Default role for a musician
