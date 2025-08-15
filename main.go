@@ -49,6 +49,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		// Obtener el token del header Authorization
+
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token requerido"})
@@ -67,6 +68,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		c.Set("userID", userID) // Almacenar el ID de usuario para su uso posterior
 		c.Set("token", token)   // Puedes almacenar el token para su uso posterior
+
 		c.Next()
 	}
 }

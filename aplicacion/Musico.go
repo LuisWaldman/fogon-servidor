@@ -26,6 +26,13 @@ type Musico struct {
 	rolSesion string
 }
 
+func (musico *Musico) ActualizarPerfil(perfil *modelo.Perfil) {
+	musico.Perfil = perfil
+	if musico.Sesion != nil {
+		musico.Sesion.ActualizarUsuarios()
+	}
+}
+
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.Sesion = sesion
 	musico.rolSesion = "default" // Default role for a musician
@@ -88,12 +95,12 @@ func (musico *Musico) MensajeSesion(msj string) {
 	musico.Sesion.MensajeSesion(msj)
 }
 
-func (musico *Musico) ActualizarCancion(nmCancion string) {
+func (musico *Musico) ActualizarCancion(nmCancion string, nmOrigenCancion string, usuarioorigenCancion string) {
 	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
-	musico.Sesion.ActualizarCancion(nmCancion)
+	musico.Sesion.ActualizarCancion(nmCancion, nmOrigenCancion, usuarioorigenCancion)
 }
 
 func (musico *Musico) GenerarToken() {
@@ -133,6 +140,11 @@ func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository) *Musico
 		ID:      0, // Default ID, should be set after login
 		Socket:  socket,
 		logRepo: logRepo,
+		Sesion:  nil,
+		Perfil: &modelo.Perfil{
+			Imagen: "",
+			Nombre: "No Cargado",
+		},
 	}
 }
 

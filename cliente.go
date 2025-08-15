@@ -58,11 +58,21 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	})
 
 	newSocket.On("actualizarCancion", func(datas ...any) {
-		if len(datas) == 1 {
-			nmCancion := datas[0].(string)
-			log.Println("actualizarCancion - actualizarCancion:", nmCancion)
-			newMusico.ActualizarCancion(nmCancion)
+		nmCancion := ""
+		origen := ""
+		usuario := ""
+		if datas[0] != nil {
+			nmCancion = datas[0].(string)
 		}
+		if datas[1] != nil {
+			origen = datas[1].(string)
+		}
+		if datas[2] != nil {
+			usuario = datas[2].(string)
+		}
+		log.Println("actualizarCancion - actualizarCancion:", nmCancion)
+		newMusico.ActualizarCancion(nmCancion, origen, usuario)
+
 	})
 
 	newSocket.On("mensajeasesion", func(datas ...any) {

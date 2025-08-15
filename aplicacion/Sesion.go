@@ -10,15 +10,17 @@ import (
 )
 
 type Sesion struct {
-	nombre   string
-	cancion  string
-	latitud  float64
-	longitud float64
-	musicos  map[int]*Musico
-	estado   string
-	inicio   float64
-	compas   int
-	Mutex    *sync.Mutex
+	nombre               string
+	cancion              string
+	origenCancion        string
+	usuarioorigenCancion string
+	latitud              float64
+	longitud             float64
+	musicos              map[int]*Musico
+	estado               string
+	inicio               float64
+	compas               int
+	Mutex                *sync.Mutex
 }
 
 func NuevaSesion(nombre string) *Sesion {
@@ -85,11 +87,14 @@ func (sesion *Sesion) ActualizarCompas(compas int) {
 	sesion.Mutex.Unlock()
 }
 
-func (sesion *Sesion) ActualizarCancion(nmCancion string) {
+func (sesion *Sesion) ActualizarCancion(nmCancion string, nmOrigenCancion string, usuarioorigenCancion string) {
 	sesion.cancion = nmCancion
+	sesion.origenCancion = nmOrigenCancion
+	sesion.usuarioorigenCancion = usuarioorigenCancion
 	sesion.Mutex.Lock()
+	println("Actualizando canción en la sesión:", sesion.nombre, " - Canción:", sesion.cancion)
 	for _, musico := range sesion.musicos {
-		musico.Socket.Emit("cancionActualizada", sesion.cancion)
+		musico.Socket.Emit("cancionActualizada", sesion.cancion, sesion.origenCancion, sesion.usuarioorigenCancion)
 	}
 	sesion.Mutex.Unlock()
 }
