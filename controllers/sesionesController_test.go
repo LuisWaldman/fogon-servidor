@@ -21,9 +21,7 @@ func TestControllerSesion(t *testing.T) {
 
 	// Crear una sesión
 	sesionID := "sesion_1"
-	latitud := 12.34
-	longitud := 56.78
-	app.CrearSesion(musico, sesionID, latitud, longitud)
+	app.CrearSesion(musico, sesionID)
 	micontroller := NuevoSesionesController(app) // Initialize the controller with the application
 
 	// Crear un contexto de prueba
