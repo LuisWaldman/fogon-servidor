@@ -74,7 +74,7 @@ func (app *Aplicacion) BuscarMusicoPorID(id int) (*Musico, bool) {
 	return musico, true
 }
 
-func (app *Aplicacion) CrearSesion(musico *Musico, sesion string, latitud float64, longitud float64) {
+func (app *Aplicacion) CrearSesion(musico *Musico, sesion string) {
 	// Check if the session already exists
 	if _, exists := app.sesiones[sesion]; exists {
 		musico.Socket.Emit("sesionFailed", "La sesion ya existe")

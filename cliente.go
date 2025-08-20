@@ -35,12 +35,10 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		newMusico.Socket.Emit("time", time)
 	})
 	newSocket.On("crearsesion", func(datas ...any) {
-		if len(datas) == 3 {
+		if len(datas) == 1 {
 			sesion := datas[0].(string)
-			latitud := datas[1].(float64)
-			longitud := datas[2].(float64)
-			log.Println("CREAR SESION - Sesion:", sesion, "Latitud:", latitud, "Longitud:", longitud)
-			MyApp.CrearSesion(newMusico, sesion, latitud, longitud)
+			log.Println("CREAR SESION - Sesion:", sesion)
+			MyApp.CrearSesion(newMusico, sesion)
 		}
 	})
 	newSocket.On("salirsesion", func(datas ...any) {
