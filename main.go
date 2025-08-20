@@ -93,6 +93,8 @@ func main() {
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 
+	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
+
 	cancionServicio := servicios.NuevoCancionServicio(client)
 	constroladorCancion := controllers.NuevoCancionController(cancionServicio)
 
@@ -122,6 +124,8 @@ func main() {
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
 	router.GET("/cancion", constroladorCancion.Get)
 	router.POST("/cancion", constroladorCancion.Post)
+	router.GET("/cancionsesion", constroladorCancionSesion.Get)
+	router.POST("/cancionsesion", constroladorCancionSesion.Post)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }

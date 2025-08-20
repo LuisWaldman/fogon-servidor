@@ -15,11 +15,9 @@ func NuevoAplicacion() *Aplicacion {
 }
 
 type SesionView struct {
-	Nombre   string  `bson:"nombre"`
-	Latitud  float64 `bson:"latitud"`
-	Longitud float64 `bson:"longitud"`
-	Usuarios int     `bson:"usuarios"`
-	Estado   string  `bson:"estado"`
+	Nombre   string `bson:"nombre"`
+	Usuarios int    `bson:"usuarios"`
+	Estado   string `bson:"estado"`
 }
 
 func (app *Aplicacion) GetSesionView() []SesionView {
@@ -28,8 +26,6 @@ func (app *Aplicacion) GetSesionView() []SesionView {
 		log.Println("Procesando sesion:", sesion.nombre)
 		sv := SesionView{
 			Nombre:   sesion.nombre,
-			Latitud:  sesion.latitud,
-			Longitud: sesion.longitud,
 			Usuarios: len(sesion.musicos),
 			Estado:   sesion.estado,
 		}
@@ -78,7 +74,7 @@ func (app *Aplicacion) BuscarMusicoPorID(id int) (*Musico, bool) {
 	return musico, true
 }
 
-func (app *Aplicacion) CrearSesion(musico *Musico, sesion string, latitud float64, longitud float64) {
+func (app *Aplicacion) CrearSesion(musico *Musico, sesion string) {
 	// Check if the session already exists
 	if _, exists := app.sesiones[sesion]; exists {
 		musico.Socket.Emit("sesionFailed", "La sesion ya existe")

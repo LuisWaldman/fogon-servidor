@@ -18,9 +18,7 @@ func TestCreoSesion(t *testing.T) {
 
 	// Crear una sesión
 	sesionID := "sesion_1"
-	latitud := 12.34
-	longitud := 56.78
-	app.CrearSesion(musico, sesionID, latitud, longitud)
+	app.CrearSesion(musico, sesionID)
 
 	// Verificar que la sesión se haya creado correctamente
 	sesion, exists := app.sesiones[sesionID]
@@ -60,7 +58,7 @@ func TestEliminaSesionesSinUsuarios(t *testing.T) {
 	musico := NuevoMusico(newSocket, *loginRepo)
 	app.AgregarMusico(musico)
 
-	app.CrearSesion(musico, "sesion", 0, 3.14)
+	app.CrearSesion(musico, "sesion")
 	assert.Equal(t, 1, len(app.sesiones), "Hay sesiones")
 	musico.SalirSesion()
 	app.ActualizarSesiones()
@@ -80,7 +78,7 @@ func TestEliminaSesionesYOtraPideUsuarios(t *testing.T) {
 	musico2 := NuevoMusico(newSocket2, *loginRepo)
 	app.AgregarMusico(musico2)
 
-	app.CrearSesion(musico, "sesion", 0, 3.14)
+	app.CrearSesion(musico, "sesion")
 	assert.Equal(t, 1, len(app.sesiones), "Hay sesiones")
 	app.UnirseSesion(musico2, "sesion")
 

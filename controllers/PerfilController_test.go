@@ -49,9 +49,7 @@ func TestPerfilControllerSesion(t *testing.T) {
 
 	// Crear una sesión
 	sesionID := "sesion_1"
-	latitud := 12.34
-	longitud := 56.78
-	app.CrearSesion(musico, sesionID, latitud, longitud)
+	app.CrearSesion(musico, sesionID)
 
 	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)

@@ -95,14 +95,6 @@ func (musico *Musico) MensajeSesion(msj string) {
 	musico.Sesion.MensajeSesion(msj)
 }
 
-func (musico *Musico) ActualizarCancion(nmCancion string, nmOrigenCancion string, usuarioorigenCancion string) {
-	if musico.Sesion == nil {
-		musico.emit("error", "No session joined")
-		return
-	}
-	musico.Sesion.ActualizarCancion(nmCancion, nmOrigenCancion, usuarioorigenCancion)
-}
-
 func (musico *Musico) GenerarToken() {
 
 	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours

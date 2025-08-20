@@ -10,17 +10,13 @@ import (
 )
 
 type Sesion struct {
-	nombre               string
-	cancion              string
-	origenCancion        string
-	usuarioorigenCancion string
-	latitud              float64
-	longitud             float64
-	musicos              map[int]*Musico
-	estado               string
-	inicio               float64
-	compas               int
-	Mutex                *sync.Mutex
+	nombre  string
+	musicos map[int]*Musico
+	estado  string
+	inicio  float64
+	compas  int
+	Mutex   *sync.Mutex
+	cancion modelo.Cancion
 }
 
 func NuevaSesion(nombre string) *Sesion {
@@ -29,6 +25,19 @@ func NuevaSesion(nombre string) *Sesion {
 		musicos: make(map[int]*Musico),
 		Mutex:   &sync.Mutex{},
 	}
+}
+
+func (sesion *Sesion) GetCancion() modelo.Cancion {
+	return sesion.cancion
+}
+func (sesion *Sesion) SetCancion(cancion modelo.Cancion) {
+	sesion.cancion = cancion
+	sesion.Mutex.Lock()
+	for _, musico := range sesion.musicos {
+		log.Print("Actualizando canción para el músico:", musico.ID)
+		musico.Socket.Emit("cancionActualizada")
+	}
+	sesion.Mutex.Unlock()
 }
 
 func (sesion *Sesion) MensajeSesion(msj string) {
@@ -87,18 +96,6 @@ func (sesion *Sesion) ActualizarCompas(compas int) {
 	sesion.Mutex.Unlock()
 }
 
-func (sesion *Sesion) ActualizarCancion(nmCancion string, nmOrigenCancion string, usuarioorigenCancion string) {
-	sesion.cancion = nmCancion
-	sesion.origenCancion = nmOrigenCancion
-	sesion.usuarioorigenCancion = usuarioorigenCancion
-	sesion.Mutex.Lock()
-	println("Actualizando canción en la sesión:", sesion.nombre, " - Canción:", sesion.cancion)
-	for _, musico := range sesion.musicos {
-		musico.Socket.Emit("cancionActualizada", sesion.cancion, sesion.origenCancion, sesion.usuarioorigenCancion)
-	}
-	sesion.Mutex.Unlock()
-}
-
 type UsuarioSesionView struct {
 	ID        int    `bson:"id"`
 	Usuario   string `bson:"usuario"`
@@ -131,9 +128,6 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 
 	}
 	sesion.musicos[musico.ID] = musico
-	if sesion.cancion != "" {
-		musico.Socket.Emit("cancionActualizada", sesion.cancion)
-	}
 	if sesion.estado == "reproduciendo" {
 		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio)
 	}
