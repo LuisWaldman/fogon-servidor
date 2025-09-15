@@ -3,6 +3,7 @@ package aplicacion
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
@@ -19,6 +20,8 @@ type Emitter interface {
 type Musico struct {
 	ID        int
 	Usuario   string
+	SDP       string
+	IPs       []string
 	Socket    Emitter
 	logRepo   logueadores.LogeadorRepository
 	Sesion    *Sesion
@@ -38,6 +41,34 @@ func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.rolSesion = "default" // Default role for a musician
 	musico.emit("ensesion", sesion.nombre)
 	sesion.AgregarMusico(musico)
+}
+
+func extraerIPsLocales(sdp string) []string {
+	var ips []string
+	lines := strings.Split(sdp, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "a=candidate:") && strings.Contains(line, "typ host") {
+			parts := strings.Split(line, " ")
+			if len(parts) >= 6 {
+				ip := parts[4]
+				ips = append(ips, ip)
+			}
+		}
+	}
+	return ips
+}
+
+func (musico *Musico) SetSDP(sdp string) {
+	musico.SDP = sdp
+	musico.IPs = extraerIPsLocales(sdp)
+	if musico.Sesion != nil {
+		musico.Sesion.NuevoSDP(musico)
+	}
+}
+
+func (musico *Musico) UpdateSDP(sdp string) {
+	musico.SDP = sdp
+	musico.IPs = extraerIPsLocales(sdp)
 }
 
 // SetRolSesion sets the role of the musician in the session
