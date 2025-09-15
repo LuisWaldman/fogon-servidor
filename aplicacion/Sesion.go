@@ -2,6 +2,7 @@ package aplicacion
 
 import (
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -17,6 +18,32 @@ type Sesion struct {
 	compas  int
 	Mutex   *sync.Mutex
 	cancion modelo.Cancion
+}
+
+func mismaRed(ipsA, ipsB []string) bool {
+	for _, ipA := range ipsA {
+		for _, ipB := range ipsB {
+			if strings.HasPrefix(ipA, "192.168.") && strings.HasPrefix(ipB, "192.168.") {
+				if strings.Split(ipA, ".")[2] == strings.Split(ipB, ".")[2] {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func (sesion *Sesion) NuevoSDP(musico *Musico) {
+
+	sesion.Mutex.Lock()
+	for _, musicoSess := range sesion.musicos {
+		if (musico.ID != musicoSess.ID) && mismaRed(musico.IPs, musicoSess.IPs) {
+
+			musico.Socket.Emit("sincronizarRTC", musicoSess.ID)
+			break
+		}
+	}
+	sesion.Mutex.Unlock()
 }
 
 func NuevaSesion(nombre string) *Sesion {

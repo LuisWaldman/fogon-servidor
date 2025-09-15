@@ -90,6 +90,9 @@ func main() {
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
+	constroladorRTC := controllers.NuevoRTCController(MyApp)
+	constroladorAnswerRTC := controllers.NuevoAnswerRTCController(MyApp)
+	constroladorUpdateRTC := controllers.NuevoUpdateRTCController(MyApp)
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 
@@ -119,6 +122,10 @@ func main() {
 
 	router.GET("/perfil", constroladorPerfil.Get)
 	router.POST("/perfil", constroladorPerfil.Post)
+	router.POST("/answerrtc", constroladorAnswerRTC.Post)
+	router.POST("/webrtc", constroladorRTC.Post)
+	router.POST("/updatertc", constroladorUpdateRTC.Post)
+	router.GET("/webrtc", constroladorRTC.Get)
 
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)

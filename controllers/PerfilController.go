@@ -41,8 +41,7 @@ func (sc *PerfilController) Post(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	user, _ := c.Get("userID") // This is to ensure the middleware has run and set the userID
-	log.Println("LLEGO A PERFIL POST", "method", c.Request.Method, "path", c.Request.URL.Path, "userID", user)
+	user, _ := c.Get("userID")                               // This is to ensure the middleware has run and set the userID
 	musico, _ := sc.aplicacion.BuscarMusicoPorID(user.(int)) // Ensure user is of type string
 	//perfil.Usuario = musico.Usuario
 	//sc.service.CrearPerfil(perfil)
