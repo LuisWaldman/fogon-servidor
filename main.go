@@ -99,7 +99,10 @@ func main() {
 	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
 
 	cancionServicio := servicios.NuevoCancionServicio(client)
-	constroladorCancion := controllers.NuevoCancionController(cancionServicio)
+	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
+
+	indiceServicio := servicios.NuevoIndiceServicio(client)
+	constroladorIndice := controllers.NuevoIndiceController(indiceServicio)
 
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
@@ -131,8 +134,17 @@ func main() {
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
 	router.GET("/cancion", constroladorCancion.Get)
 	router.POST("/cancion", constroladorCancion.Post)
+	router.DELETE("/cancion", constroladorCancion.Delete)
+	router.GET("/cancion/owner", constroladorCancion.GetByOwner)
 	router.GET("/cancionsesion", constroladorCancionSesion.Get)
 	router.POST("/cancionsesion", constroladorCancionSesion.Post)
+
+	// Rutas para índices
+	router.GET("/indice", constroladorIndice.GetByName)
+	router.DELETE("/indice", constroladorIndice.Delete)
+	router.GET("/indice/owner", constroladorIndice.GetByOwner)
+	router.GET("/indice/search", constroladorIndice.GetByNameAndOwner)
+	router.GET("/indices", constroladorIndice.GetAll)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
