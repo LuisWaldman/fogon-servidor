@@ -102,7 +102,7 @@ func main() {
 	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
 
 	indiceServicio := servicios.NuevoIndiceServicio(client)
-	constroladorIndice := controllers.NuevoIndiceController(indiceServicio)
+	constroladorIndice := controllers.NuevoIndiceController(indiceServicio, MyApp)
 
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/LuisWaldman/fogon-servidor/aplicacion"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 
 	"github.com/gin-gonic/gin"
@@ -11,20 +12,25 @@ import (
 
 type IndiceController struct {
 	indiceServicio *servicios.IndiceServicio
+	aplicacion     *aplicacion.Aplicacion
 }
 
-func NuevoIndiceController(indiceServicio *servicios.IndiceServicio) *IndiceController {
+func NuevoIndiceController(indiceServicio *servicios.IndiceServicio, aplicacion *aplicacion.Aplicacion) *IndiceController {
 	return &IndiceController{
 		indiceServicio: indiceServicio,
+		aplicacion:     aplicacion,
 	}
 }
 
 // GetByOwner obtiene todos los índices de canciones para un owner específico
 func (controller *IndiceController) GetByOwner(c *gin.Context) {
-	owner := c.Query("owner")
-	if owner == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Parámetro 'owner' requerido"})
-		return
+	user, _ := c.Get("userID")
+	musico, _ := controller.aplicacion.BuscarMusicoPorID(user.(int))
+	owner := musico.Usuario
+
+	// Check if owner is provided in the query param, if yes, use it instead of the user's owner
+	if ownerParam := c.Query("owner"); ownerParam != "" {
+		owner = ownerParam
 	}
 
 	indices, err := controller.indiceServicio.BuscarPorOwner(owner)
