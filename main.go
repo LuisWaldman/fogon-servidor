@@ -89,22 +89,23 @@ func main() {
 	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
+	listaServicio := servicios.NuevoListaServicio(client)
+	listaCancionServicio := servicios.NuevoListaCancionServicio(client)
+	cancionServicio := servicios.NuevoCancionServicio(client)
+	indiceServicio := servicios.NuevoIndiceServicio(client)
+	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
 	constroladorRTC := controllers.NuevoRTCController(MyApp)
 	constroladorAnswerRTC := controllers.NuevoAnswerRTCController(MyApp)
 	constroladorUpdateRTC := controllers.NuevoUpdateRTCController(MyApp)
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
-
 	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
-
-	cancionServicio := servicios.NuevoCancionServicio(client)
 	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
-
-	indiceServicio := servicios.NuevoIndiceServicio(client)
 	constroladorIndice := controllers.NuevoIndiceController(indiceServicio, MyApp)
+	controladorLista := controllers.NuevoListaController(listaServicio, MyApp)
+	//controladorListaCancion := controllers.NuevoListaCancionController(listaCancionServicio, listaServicio, indiceServicio, MyApp)
 
-	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
 	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
 
