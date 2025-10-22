@@ -86,3 +86,53 @@ func TestCrearYBorrarLista(t *testing.T) {
 	lista_c, _ := servicio.BuscarPorNombreYOwner(nombreLista, ownerLista)
 	assert.Nil(t, lista_c, "Lista debería haber sido borrada pero aún existe")
 }
+
+func TestRenombrarLista(t *testing.T) {
+	// Crear nombres únicos para evitar conflictos
+	nombreOriginal := "ListaARenombrar_" + RandString(8)
+	nombreNuevo := "ListaRenombrada_" + RandString(8)
+	ownerTest := "usuario_test_" + RandString(8)
+
+	client, err := datos.ConnectDB()
+	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
+	servicio := NuevoListaServicio(client)
+
+	// Limpiar si existen las listas de prueba
+	servicio.BorrarPorNombreYOwner(nombreOriginal, ownerTest)
+	servicio.BorrarPorNombreYOwner(nombreNuevo, ownerTest)
+
+	// Crear la lista con nombre original
+	lista := modelo.NuevaLista(nombreOriginal, ownerTest)
+	err = servicio.CrearLista(lista)
+	assert.Nil(t, err, "Error al crear lista original: %v", err)
+
+	// Verificar que se creó correctamente
+	listaOriginal, err := servicio.BuscarPorNombreYOwner(nombreOriginal, ownerTest)
+	assert.Nil(t, err, "Error al buscar lista original: %v", err)
+	assert.NotNil(t, listaOriginal, "Lista original no se creó correctamente")
+
+	// Renombrar la lista
+	err = servicio.RenombrarLista(listaOriginal.ID.Hex(), nombreNuevo)
+	assert.Nil(t, err, "Error al renombrar lista: %v", err)
+
+	// Verificar que existe la lista con el nuevo nombre
+	listaRenombrada, err := servicio.BuscarPorNombreYOwner(nombreNuevo, ownerTest)
+	assert.Nil(t, err, "Error al buscar lista renombrada: %v", err)
+	assert.NotNil(t, listaRenombrada, "Lista renombrada no existe")
+
+	// Verificar que no existe la lista con el nombre original
+	listaAntigua, _ := servicio.BuscarPorNombreYOwner(nombreOriginal, ownerTest)
+	assert.Nil(t, listaAntigua, "Lista original no debería existir después del renombrado")
+
+	// Verificar que los datos se mantuvieron, excepto el nombre
+	if listaRenombrada != nil {
+		assert.Equal(t, nombreNuevo, listaRenombrada.Nombre, "El nuevo nombre no se actualizó correctamente")
+		assert.Equal(t, ownerTest, listaRenombrada.Owner, "El owner no se mantuvo correctamente")
+		assert.Equal(t, listaOriginal.ID, listaRenombrada.ID, "El ID no debería cambiar al renombrar")
+	}
+
+	// Limpiar
+	if listaRenombrada != nil {
+		servicio.BorrarPorID(listaRenombrada.ID.Hex())
+	}
+}

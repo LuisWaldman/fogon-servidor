@@ -22,7 +22,7 @@ func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
 		c.Header("Access-Control-Allow-Origin", AppConfig.Site)
-		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		// Manejar preflight requests
@@ -90,7 +90,7 @@ func main() {
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
 	listaServicio := servicios.NuevoListaServicio(client)
-	listaCancionServicio := servicios.NuevoListaCancionServicio(client)
+	//listaCancionServicio := servicios.NuevoListaCancionServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
 	indiceServicio := servicios.NuevoIndiceServicio(client)
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
@@ -146,6 +146,12 @@ func main() {
 	router.GET("/indice/owner", constroladorIndice.GetByOwner)
 	router.GET("/indice/search", constroladorIndice.GetByNameAndOwner)
 	router.GET("/indices", constroladorIndice.GetAll)
+
+	// Rutas para listas
+	router.GET("/lista", controladorLista.GetByOwner)
+	router.POST("/lista", controladorLista.Post)
+	router.PUT("/lista", controladorLista.Put)
+	router.DELETE("/lista", controladorLista.Delete)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }

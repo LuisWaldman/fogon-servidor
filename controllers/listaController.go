@@ -106,26 +106,38 @@ func (controller *ListaController) GetByOwner(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, listas)
+	if len(listas) == 0 {
+		c.JSON(http.StatusOK, []string{})
+		return
+	}
+
+	nombreListas := make([]string, len(listas))
+	for i, lista := range listas {
+		nombreListas[i] = lista.Nombre
+	}
+	c.JSON(http.StatusOK, nombreListas)
 }
 
 // Put actualiza/renombra una lista
 func (controller *ListaController) Put(c *gin.Context) {
-	id := c.Query("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Parámetro 'id' requerido"})
-		return
+	var request struct {
+		Nombre      string `json:"nombre" binding:"required"`
+		NuevoNombre string `json:"nuevoNombre" binding:"required"`
 	}
 
-	var actualizacion map[string]interface{}
-	if err := c.ShouldBindJSON(&actualizacion); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Println("Error al decodificar JSON:", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido o campos requeridos faltantes"})
 		return
 	}
 
-	// Verificar que la lista existe y pertenece al usuario
-	lista, err := controller.listaServicio.BuscarPorID(id)
+	// Obtener el owner del usuario autenticado
+	user, _ := c.Get("userID")
+	musico, _ := controller.aplicacion.BuscarMusicoPorID(user.(int))
+	owner := musico.Usuario
+
+	// Buscar la lista por nombre y owner
+	lista, err := controller.listaServicio.BuscarPorNombreYOwner(request.Nombre, owner)
 	if err != nil {
 		log.Println("Error obteniendo lista:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
@@ -136,21 +148,33 @@ func (controller *ListaController) Put(c *gin.Context) {
 		return
 	}
 
-	user, _ := c.Get("userID")
-	musico, _ := controller.aplicacion.BuscarMusicoPorID(user.(int))
-	if lista.Owner != musico.Usuario {
-		c.JSON(http.StatusForbidden, gin.H{"error": "No tiene permisos para modificar esta lista"})
-		return
+	// Verificar si ya existe una lista con el nuevo nombre
+	if request.Nombre != request.NuevoNombre {
+		existeLista, err := controller.listaServicio.BuscarPorNombreYOwner(request.NuevoNombre, owner)
+		if err != nil {
+			log.Println("Error verificando lista existente:", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
+			return
+		}
+		if existeLista != nil {
+			c.JSON(http.StatusConflict, gin.H{"error": "Ya existe una lista con ese nombre"})
+			return
+		}
 	}
 
-	err = controller.listaServicio.ActualizarLista(id, actualizacion)
+	// Actualizar la lista con el nuevo nombre
+	actualizacion := map[string]interface{}{
+		"nombre": request.NuevoNombre,
+	}
+
+	err = controller.listaServicio.ActualizarLista(lista.ID.Hex(), actualizacion)
 	if err != nil {
 		log.Println("Error actualizando lista:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
 		return
 	}
 
-	log.Println("Lista actualizada exitosamente:", id)
+	log.Println("Lista actualizada exitosamente:", request.Nombre, "->", request.NuevoNombre)
 	c.JSON(http.StatusOK, gin.H{"message": "Lista actualizada exitosamente"})
 }
 
