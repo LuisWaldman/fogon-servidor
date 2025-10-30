@@ -1,68 +1,28 @@
 package modelo
 
-import (
-	"strings"
-	"unicode"
-
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
-)
-
-type OrigenCancion struct {
-	OrigenUrl string `bson:"origenUrl" json:"origenUrl"`
-	FileName  string `bson:"fileName" json:"fileName"`
-	Usuario   string `bson:"usuario" json:"usuario"`
-}
-
 type ItemIndiceCancion struct {
-	Origen         OrigenCancion `bson:"origen" json:"origen"`
-	Cancion        string        `bson:"cancion" json:"cancion"`
-	Banda          string        `bson:"banda" json:"banda"`
-	Acordes        string        `bson:"acordes" json:"acordes"`
-	Owner          string        `bson:"owner" json:"owner"`
-	Escala         string        `bson:"escala" json:"escala"`
-	TotalCompases  int           `bson:"totalCompases" json:"totalCompases"`
-	CompasUnidad   int           `bson:"compasUnidad" json:"compasUnidad"`
-	CompasCantidad int           `bson:"compasCantidad" json:"compasCantidad"`
-	BPM            int           `bson:"bpm" json:"bpm"`
-	CantAcordes    int           `bson:"cantacordes" json:"cantacordes"`
-	CantPartes     int           `bson:"cantpartes" json:"cantpartes"`
-	Calidad        int           `bson:"calidad" json:"calidad"`
-	Video          bool          `bson:"video" json:"video"`
-	Pentagramas    []string      `bson:"pentagramas" json:"pentagramas"`
-	Etiquetas      []string      `bson:"etiquetas" json:"etiquetas"`
+	OrigenUrl      string   `bson:"origenUrl" json:"origenUrl"`
+	FileName       string   `bson:"fileName" json:"fileName"`
+	Usuario        string   `bson:"usuario" json:"usuario"`
+	Cancion        string   `bson:"cancion" json:"cancion"`
+	Banda          string   `bson:"banda" json:"banda"`
+	Acordes        string   `bson:"acordes" json:"acordes"`
+	Owner          string   `bson:"owner" json:"owner"`
+	Escala         string   `bson:"escala" json:"escala"`
+	TotalCompases  int      `bson:"totalCompases" json:"totalCompases"`
+	CompasUnidad   int      `bson:"compasUnidad" json:"compasUnidad"`
+	CompasCantidad int      `bson:"compasCantidad" json:"compasCantidad"`
+	BPM            int      `bson:"bpm" json:"bpm"`
+	CantAcordes    int      `bson:"cantacordes" json:"cantacordes"`
+	CantPartes     int      `bson:"cantpartes" json:"cantpartes"`
+	Calidad        int      `bson:"calidad" json:"calidad"`
+	Video          bool     `bson:"video" json:"video"`
+	Pentagramas    []string `bson:"pentagramas" json:"pentagramas"`
+	Etiquetas      []string `bson:"etiquetas" json:"etiquetas"`
 }
 
-func (item *ItemIndiceCancion) NormalizarTexto(texto string) string {
-	// Normalizar unicode y remover acentos
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	normalized, _, _ := transform.String(t, texto)
-
-	// Convertir a minúsculas y reemplazar espacios con guiones bajos
-	normalized = strings.ToLower(normalized)
-	normalized = strings.ReplaceAll(normalized, " ", "_")
-	normalized = strings.ReplaceAll(normalized, "ñ", "n")
-
-	return normalized
-}
-
-func (item *ItemIndiceCancion) Normalizar() {
-	if item.Origen.FileName == "" {
-		item.Origen.FileName = item.NormalizarTexto(item.Banda) + "_" + item.NormalizarTexto(item.Cancion)
-	}
-}
-
-func (item *ItemIndiceCancion) DuracionCancion() float64 {
-	if item.BPM == 0 {
-		return 0
-	}
-	return float64(item.TotalCompases) * ((60.0 / float64(item.BPM)) * float64(item.CompasCantidad))
-}
-
-func NewItemIndiceCancion(origen OrigenCancion, cancion string, banda string) *ItemIndiceCancion {
+func NewItemIndiceCancion(cancion string, banda string) *ItemIndiceCancion {
 	return &ItemIndiceCancion{
-		Origen:         origen,
 		Cancion:        cancion,
 		Banda:          banda,
 		Acordes:        "",
@@ -81,8 +41,8 @@ func NewItemIndiceCancion(origen OrigenCancion, cancion string, banda string) *I
 	}
 }
 
-func BuildFromCancion(cancion *Cancion, origen OrigenCancion) *ItemIndiceCancion {
-	item := NewItemIndiceCancion(origen, "", "")
+func BuildFromCancion(cancion *Cancion) *ItemIndiceCancion {
+	item := NewItemIndiceCancion("", "")
 
 	// Extraer información del JSON de la canción
 	if datosJSON := cancion.DatosJSON; datosJSON != nil {
@@ -136,8 +96,5 @@ func BuildFromCancion(cancion *Cancion, origen OrigenCancion) *ItemIndiceCancion
 	}
 
 	item.Owner = cancion.Owner
-	item.Origen.FileName = cancion.NombreArchivo
-	item.Normalizar()
-
 	return item
 }

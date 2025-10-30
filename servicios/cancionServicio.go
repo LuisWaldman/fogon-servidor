@@ -33,13 +33,7 @@ func (s *CancionServicio) CrearCancion(cancion modelo.Cancion) error {
 		return err
 	}
 
-	// Crear y guardar el índice
-	origen := modelo.OrigenCancion{
-		OrigenUrl: "local",
-		FileName:  cancion.NombreArchivo,
-		Usuario:   cancion.Owner,
-	}
-	indice := modelo.BuildFromCancion(&cancion, origen)
+	indice := modelo.BuildFromCancion(&cancion)
 	err = s.indiceServicio.CrearIndice(indice)
 	if err != nil {
 		log.Println("Error creando índice para canción", "err", err)

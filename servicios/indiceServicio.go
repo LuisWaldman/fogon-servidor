@@ -24,7 +24,7 @@ func NuevoIndiceServicio(db *mongo.Client) *IndiceServicio {
 
 func (s *IndiceServicio) CrearIndice(indice *modelo.ItemIndiceCancion) error {
 	// Elimina el índice existente si existe
-	s.BorrarPorNombreYOwner(indice.Origen.FileName, indice.Owner)
+	s.BorrarPorNombreYOwner(indice.FileName, indice.Owner)
 
 	col := s.db.Database(database).Collection(s.collection)
 	inserta, err := col.InsertOne(context.TODO(), indice)

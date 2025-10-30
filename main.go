@@ -133,10 +133,6 @@ func main() {
 
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
-	router.GET("/cancion", constroladorCancion.Get)
-	router.POST("/cancion", constroladorCancion.Post)
-	router.DELETE("/cancion", constroladorCancion.Delete)
-	router.GET("/cancion/owner", constroladorCancion.GetByOwner)
 	router.GET("/cancionsesion", constroladorCancionSesion.Get)
 	router.POST("/cancionsesion", constroladorCancionSesion.Post)
 
@@ -152,6 +148,12 @@ func main() {
 	router.POST("/lista", controladorLista.Post)
 	router.PUT("/lista", controladorLista.Put)
 	router.DELETE("/lista", controladorLista.Delete)
+
+	router.GET("/cancion", constroladorCancion.Get)
+
+	router.GET("/cancion/owner", constroladorCancion.GetByOwner)
+	router.POST("/cancion", constroladorCancion.Post)
+	router.DELETE("/cancion", constroladorCancion.Delete)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
