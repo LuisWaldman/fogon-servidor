@@ -11,16 +11,14 @@ import (
 )
 
 type CancionServicio struct {
-	db             *mongo.Client
-	collection     string
-	indiceServicio *IndiceServicio
+	db         *mongo.Client
+	collection string
 }
 
 func NuevoCancionServicio(db *mongo.Client) *CancionServicio {
 	return &CancionServicio{
-		db:             db,
-		collection:     "cancion",
-		indiceServicio: NuevoIndiceServicio(db),
+		db:         db,
+		collection: "cancion",
 	}
 }
 
@@ -31,13 +29,6 @@ func (s *CancionServicio) CrearCancion(cancion modelo.Cancion) error {
 	if err != nil {
 		log.Println("Error creando Cancion", "err", err)
 		return err
-	}
-
-	indice := modelo.BuildFromCancion(&cancion)
-	err = s.indiceServicio.CrearIndice(indice)
-	if err != nil {
-		log.Println("Error creando índice para canción", "err", err)
-		// No retornamos el error para no fallar la creación de la canción
 	}
 
 	log.Println("Cancion creada", inserta)
@@ -109,9 +100,6 @@ func (s *CancionServicio) BorrarPorNombre(nombreArchivo string) error {
 		return err
 	}
 
-	// También borrar del índice
-	s.indiceServicio.BorrarPorNombre(nombreArchivo)
-
 	return nil
 }
 
@@ -126,9 +114,6 @@ func (s *CancionServicio) BorrarPorNombreYOwner(nombreArchivo string, owner stri
 		log.Println("Error borrando cancion por nombre y owner", "err", err)
 		return err
 	}
-
-	// También borrar del índice
-	s.indiceServicio.BorrarPorNombreYOwner(nombreArchivo, owner)
 
 	return nil
 }

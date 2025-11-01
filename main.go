@@ -89,10 +89,10 @@ func main() {
 	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
-	listaServicio := servicios.NuevoListaServicio(client)
+	//listaServicio := servicios.NuevoListaServicio(client)
 	//listaCancionServicio := servicios.NuevoListaCancionServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
-	indiceServicio := servicios.NuevoIndiceServicio(client)
+	//indiceServicio := servicios.NuevoIndiceServicio(client)
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
 	constroladorRTC := controllers.NuevoRTCController(MyApp)
@@ -102,8 +102,8 @@ func main() {
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
 	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
-	constroladorIndice := controllers.NuevoIndiceController(indiceServicio, MyApp)
-	controladorLista := controllers.NuevoListaController(listaServicio, MyApp)
+	//constroladorIndice := controllers.NuevoIndiceController(indiceServicio, MyApp)
+	//controladorLista := controllers.NuevoListaController(listaServicio, MyApp)
 	//controladorListaCancion := controllers.NuevoListaCancionController(listaCancionServicio, listaServicio, indiceServicio, MyApp)
 
 	loginRepo := logueadores.NewLogeadorRepository()
@@ -137,17 +137,17 @@ func main() {
 	router.POST("/cancionsesion", constroladorCancionSesion.Post)
 
 	// Rutas para índices
-	router.GET("/indice", constroladorIndice.GetByName)
-	router.DELETE("/indice", constroladorIndice.Delete)
-	router.GET("/indice/owner", constroladorIndice.GetByOwner)
-	router.GET("/indice/search", constroladorIndice.GetByNameAndOwner)
-	router.GET("/indices", constroladorIndice.GetAll)
+	////router.GET("/indice", constroladorIndice.GetByName)
+	//router.DELETE("/indice", constroladorIndice.Delete)
+	//router.GET("/indice/owner", constroladorIndice.GetByOwner)
+	//router.GET("/indice/search", constroladorIndice.GetByNameAndOwner)
+	//router.GET("/indices", constroladorIndice.GetAll)
 
 	// Rutas para listas
-	router.GET("/lista", controladorLista.GetByOwner)
-	router.POST("/lista", controladorLista.Post)
-	router.PUT("/lista", controladorLista.Put)
-	router.DELETE("/lista", controladorLista.Delete)
+	//router.GET("/lista", controladorLista.GetByOwner)
+	//router.POST("/lista", controladorLista.Post)
+	//router.PUT("/lista", controladorLista.Put)
+	//router.DELETE("/lista", controladorLista.Delete)
 
 	router.GET("/cancion", constroladorCancion.Get)
 

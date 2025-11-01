@@ -12,15 +12,13 @@ type ListaCancion struct {
 	ItemIndiceCancion ItemIndiceCancion  `bson:"itemIndiceCancion" json:"itemIndiceCancion"`
 	Orden             int                `bson:"orden" json:"orden"`
 	FechaAgregada     time.Time          `bson:"fechaAgregada" json:"fechaAgregada"`
-	Notas             string             `bson:"notas" json:"notas"`
 }
 
-func NuevaListaCancion(listaID primitive.ObjectID, item ItemIndiceCancion, orden int) *ListaCancion {
+func NuevaListaCancion(listaID primitive.ObjectID, item *ItemIndiceCancion, orden int) *ListaCancion {
 	return &ListaCancion{
 		ListaID:           listaID,
-		ItemIndiceCancion: item,
+		ItemIndiceCancion: *item,
 		Orden:             orden,
 		FechaAgregada:     time.Now(),
-		Notas:             "",
 	}
 }
