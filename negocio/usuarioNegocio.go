@@ -40,6 +40,10 @@ func (n *UsuarioNegocio) BorrarPorUsuario(nombreUsuario string) error {
 	return n.usuarioServicio.BorrarPorUsuario(nombreUsuario)
 }
 
+func (n *UsuarioNegocio) BorrarLista(nombreLista string, owner string) error {
+	return n.listaNegocio.BorrarLista(nombreLista, owner)
+}
+
 func (n *UsuarioNegocio) AgregarCancion(nombreUsuario string, cancion *modelo.Cancion) error {
 	n.listaNegocio.AgregarCancionALista(nombreUsuario, "FOGON@FOGON", modelo.BuildFromCancion(cancion))
 	return n.cancionServicio.CrearCancion(cancion)
@@ -65,4 +69,14 @@ func (n *UsuarioNegocio) GetListasPorUsuario(nombreUsuario string) ([]string, er
 		return nil, nil
 	}
 	return user.Listas, nil
+}
+
+func (n *UsuarioNegocio) RenombrarLista(nombreActual string, nuevoNombre string, nombreUsuario string) error {
+	lista, err := n.listaNegocio.GetLista(nombreActual, nombreUsuario)
+	if err != nil {
+		return err
+	}
+
+	lista.Nombre = nuevoNombre
+	return n.listaNegocio.listaServicio.ActualizarLista(lista)
 }

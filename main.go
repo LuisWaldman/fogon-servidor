@@ -10,6 +10,7 @@ import (
 	Config "github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/controllers"
 	"github.com/LuisWaldman/fogon-servidor/datos"
+	"github.com/LuisWaldman/fogon-servidor/negocio"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 
 	"github.com/gin-gonic/gin"
@@ -89,11 +90,16 @@ func main() {
 	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
-	//listaServicio := servicios.NuevoListaServicio(client)
+	listaServicio := servicios.NuevoListaServicio(client)
 	//listaCancionServicio := servicios.NuevoListaCancionServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
+	itemIndiceServicio := servicios.NuevoItemIndiceCancionServicio(client)
 	//indiceServicio := servicios.NuevoIndiceServicio(client)
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
+
+	//listaNegocio := negocio.NuevoListaNegocio(cancionServicio, listaServicio, itemIndiceServicio)
+	usuarioNegocio := negocio.NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio, itemIndiceServicio)
+
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
 	constroladorRTC := controllers.NuevoRTCController(MyApp)
 	constroladorAnswerRTC := controllers.NuevoAnswerRTCController(MyApp)
@@ -102,8 +108,8 @@ func main() {
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
 	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
-	//constroladorIndice := controllers.NuevoIndiceController(indiceServicio, MyApp)
-	//controladorLista := controllers.NuevoListaController(listaServicio, MyApp)
+
+	controladorLista := controllers.NuevoListaController(usuarioNegocio, MyApp)
 	//controladorListaCancion := controllers.NuevoListaCancionController(listaCancionServicio, listaServicio, indiceServicio, MyApp)
 
 	loginRepo := logueadores.NewLogeadorRepository()
@@ -136,18 +142,11 @@ func main() {
 	router.GET("/cancionsesion", constroladorCancionSesion.Get)
 	router.POST("/cancionsesion", constroladorCancionSesion.Post)
 
-	// Rutas para índices
-	////router.GET("/indice", constroladorIndice.GetByName)
-	//router.DELETE("/indice", constroladorIndice.Delete)
-	//router.GET("/indice/owner", constroladorIndice.GetByOwner)
-	//router.GET("/indice/search", constroladorIndice.GetByNameAndOwner)
-	//router.GET("/indices", constroladorIndice.GetAll)
-
 	// Rutas para listas
-	//router.GET("/lista", controladorLista.GetByOwner)
-	//router.POST("/lista", controladorLista.Post)
-	//router.PUT("/lista", controladorLista.Put)
-	//router.DELETE("/lista", controladorLista.Delete)
+	router.GET("/lista", controladorLista.Get)
+	router.POST("/lista", controladorLista.Post)
+	router.PUT("/lista", controladorLista.Put)
+	router.DELETE("/lista", controladorLista.Delete)
 
 	router.GET("/cancion", constroladorCancion.Get)
 
