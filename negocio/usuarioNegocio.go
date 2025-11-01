@@ -36,6 +36,11 @@ func (n *UsuarioNegocio) GetCancionesPorUsuario(nombreUsuario string) []*modelo.
 	return canciones
 }
 
+func (n *UsuarioNegocio) GetCancionesLista(nombreLista string, owner string) []*modelo.ItemIndiceCancion {
+	canciones, _ := n.listaNegocio.GetListaCanciones(nombreLista, owner)
+	return canciones
+}
+
 func (n *UsuarioNegocio) BorrarPorUsuario(nombreUsuario string) error {
 	return n.usuarioServicio.BorrarPorUsuario(nombreUsuario)
 }

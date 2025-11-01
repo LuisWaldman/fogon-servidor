@@ -92,29 +92,6 @@ func (controller *CancionController) Post(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Canción guardada exitosamente"})
 }
 
-// GetByOwner obtiene todas las canciones de un owner específico
-func (controller *CancionController) GetByOwner(c *gin.Context) {
-	owner := c.Query("owner")
-	if owner == "" {
-		// Si no se proporciona owner, usar el del token de autenticación
-		userID, exists := c.Get("userID")
-		if !exists {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Parámetro 'owner' requerido"})
-			return
-		}
-		owner = userID.(string)
-	}
-
-	canciones, err := controller.cancionServicio.BuscarPorOwner(owner)
-	if err != nil {
-		log.Println("Error obteniendo canciones por owner:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
-		return
-	}
-
-	c.JSON(http.StatusOK, canciones)
-}
-
 // Delete elimina una canción por nombre y owner
 func (controller *CancionController) Delete(c *gin.Context) {
 	nombreArchivo := c.Query("nombre")

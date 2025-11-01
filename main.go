@@ -110,6 +110,7 @@ func main() {
 	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
 
 	controladorLista := controllers.NuevoListaController(usuarioNegocio, MyApp)
+	controladorItemIndice := controllers.NuevoItemCancionesListasController(usuarioNegocio, MyApp)
 	//controladorListaCancion := controllers.NuevoListaCancionController(listaCancionServicio, listaServicio, indiceServicio, MyApp)
 
 	loginRepo := logueadores.NewLogeadorRepository()
@@ -149,10 +150,12 @@ func main() {
 	router.DELETE("/lista", controladorLista.Delete)
 
 	router.GET("/cancion", constroladorCancion.Get)
-
-	router.GET("/cancion/owner", constroladorCancion.GetByOwner)
 	router.POST("/cancion", constroladorCancion.Post)
 	router.DELETE("/cancion", constroladorCancion.Delete)
+
+	router.GET("/itemcancionlista", controladorItemIndice.GetCancionesLista)
+	router.POST("/itemcancionlista", controladorItemIndice.PostCancionesLista)
+	router.GET("/itemcancionusuario", controladorItemIndice.GetCancionesPorUsuario)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
