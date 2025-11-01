@@ -1,6 +1,7 @@
 package servicios
 
 import (
+	"math/rand"
 	"testing"
 
 	datos "github.com/LuisWaldman/fogon-servidor/datos"
@@ -100,5 +101,31 @@ func TestRenombrarLista(t *testing.T) {
 	// Limpiar
 	if listaRenombrada != nil {
 		servicio.BorrarPorID(listaRenombrada.ID.Hex())
+	}
+}
+
+func TestCambiarCantidadCanciones(t *testing.T) {
+	// Crear nombres únicos para evitar conflictos
+	nombreOriginal := "ListaACambiarNum_" + RandString(8)
+	ownerTest := "usuario_test_" + RandString(8)
+
+	client, err := datos.ConnectDB()
+	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
+	servicio := NuevoListaServicio(client)
+
+	servicio.CrearLista(nombreOriginal, ownerTest)
+	lista, err := servicio.BuscarPorNombreYOwner(nombreOriginal, ownerTest)
+	assert.Nil(t, err, "Error al buscar lista")
+	assert.NotNil(t, lista, "Lista no encontrada después de crear")
+	nroAlAzar := rand.Intn(100) // Generar un número aleatorio entre 0 y 100
+	lista.TotalCanciones = nroAlAzar
+	servicio.ActualizarLista(lista)
+	listaActualizada, _ := servicio.BuscarPorNombreYOwner(nombreOriginal, ownerTest)
+	assert.NotNil(t, listaActualizada, "Lista actualizada no encontrada")
+	assert.Equal(t, nroAlAzar, listaActualizada.TotalCanciones, "La cantidad de canciones no se actualizó correctamente")
+
+	// Limpiar
+	if listaActualizada != nil {
+		servicio.BorrarPorID(listaActualizada.ID.Hex())
 	}
 }

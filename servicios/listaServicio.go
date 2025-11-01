@@ -37,27 +37,16 @@ func (s *ListaServicio) CrearLista(Nombre string, Owner string) error {
 func (s *ListaServicio) BuscarPorNombreYOwner(nombre string, owner string) (*modelo.Lista, error) {
 	col := s.db.Database(database).Collection(s.collection)
 	filter := bson.M{"owner": owner, "nombre": nombre}
-	cursor, err := col.Find(context.TODO(), filter)
+	var lista modelo.Lista
+	err := col.FindOne(context.TODO(), filter).Decode(&lista)
 	if err != nil {
-		log.Println("Error obteniendo listas", "err", err)
-		return nil, err
-	}
-	defer cursor.Close(context.TODO())
-
-	var lista *modelo.Lista
-	for cursor.Next(context.TODO()) {
-		var l modelo.Lista
-		if err := cursor.Decode(&l); err != nil {
-			log.Println("Error decodificando lista", "err", err)
-			continue
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
 		}
-		lista = &l
-	}
-	if err := cursor.Err(); err != nil {
-		log.Println("Error iterando cursor", "err", err)
+		log.Println("Error obteniendo lista", "err", err)
 		return nil, err
 	}
-	return lista, nil
+	return &lista, nil
 }
 func (s *ListaServicio) ActualizarLista(lista *modelo.Lista) error {
 	col := s.db.Database(database).Collection(s.collection)
