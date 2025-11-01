@@ -15,9 +15,14 @@ func TestUsuarioNuevo_CrearYBuscar(t *testing.T) {
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
 	listaServicio := servicios.NuevoListaServicio(client)
-	negocioUsuario := NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio)
+	itemServicio := servicios.NuevoItemIndiceCancionServicio(client)
+
+	// CREO NEGOCIO USUARIO
+	negocioUsuario := NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio, itemServicio)
+
+	negocioUsuario.BorrarPorUsuario(nombreUsuario)
 	negocioUsuario.CrearUsuario(nombreUsuario)
-	user, err := negocioUsuario.BuscarPorNombre(nombreUsuario)
+	user, err := negocioUsuario.BuscarPorUsuario(nombreUsuario)
 	assert.Nil(t, err, "Error al buscar usuario: %v", err)
 	assert.NotNil(t, user, "Usuario no encontrado")
 	assert.Equal(t, nombreUsuario, user.Usuario, "Nombre de usuario incorrecto")
