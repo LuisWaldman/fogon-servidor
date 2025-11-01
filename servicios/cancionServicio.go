@@ -22,7 +22,7 @@ func NuevoCancionServicio(db *mongo.Client) *CancionServicio {
 	}
 }
 
-func (s *CancionServicio) CrearCancion(cancion modelo.Cancion) error {
+func (s *CancionServicio) CrearCancion(cancion *modelo.Cancion) error {
 	s.BorrarPorNombreYOwner(cancion.NombreArchivo, cancion.Owner) // Elimina la canción existente antes de crear una nueva
 	col := s.db.Database(database).Collection(s.collection)
 	inserta, err := col.InsertOne(context.TODO(), cancion)

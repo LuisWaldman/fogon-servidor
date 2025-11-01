@@ -79,6 +79,46 @@ func TestCreaYBorra(t *testing.T) {
 	assert.False(t, usuarioborrado.Encontrado, "El usuario no debería existir")
 }
 
+func TestCreaYAgregaListas(t *testing.T) {
+
+	client, errDB := datos.ConnectDB()
+	assert.Nil(t, errDB, "Error al crear base de datos: %v", errDB)
+	servicio := NuevoUsuarioServicio(client)
+	nombre := "test_user_" + RandString(8)
+	usuario, _ := servicio.BuscarPorUsuario(nombre)
+	if usuario.Encontrado {
+		servicio.BorrarPorUsuario(nombre)
+		usuarioborrado, _ := servicio.BuscarPorUsuario(nombre)
+		assert.False(t, usuarioborrado.Encontrado, "El usuario no debería existir")
+
+	}
+
+	usuarioNuevo := &modelo.Usuario{}
+	usuarioNuevo.Modologin = "USERPASS"
+	usuarioNuevo.Usuario = nombre
+	usuarioNuevo.Clave = "par_2"
+	err := servicio.CrearUsuario(*usuarioNuevo)
+	assert.Nil(t, err, "Error al crear usuario: %v", err)
+
+	usuariocreado, _ := servicio.BuscarPorUsuario(nombre)
+	assert.NotNil(t, usuariocreado, "Usuario no encontrado")
+	assert.True(t, usuariocreado.Encontrado, "El usuario debería existir")
+	assert.Equal(t, "USERPASS", usuariocreado.Modologin, "El modo de login no coincide")
+
+	usuariocreado.Listas = append(usuarioNuevo.Listas, "Lista1", "Lista2")
+	err = servicio.ActualizarUsuario(usuariocreado)
+	assert.Nil(t, err, "Error al actualizar usuario: %v", err)
+
+	usuariomodificado, _ := servicio.BuscarPorUsuario(nombre)
+	assert.NotNil(t, usuariomodificado, "Usuario no encontrado")
+	assert.True(t, usuariomodificado.Encontrado, "El usuario debería existir")
+	assert.Equal(t, 2, len(usuariomodificado.Listas), "El usuario debería tener 2 listas")
+
+	servicio.BorrarPorUsuario(nombre)
+	usuarioborrado, _ := servicio.BuscarPorUsuario(nombre)
+	assert.False(t, usuarioborrado.Encontrado, "El usuario no debería existir")
+}
+
 func RandString(i int) string {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, i)

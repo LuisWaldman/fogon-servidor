@@ -58,3 +58,15 @@ func (s *UsuarioServicio) BorrarPorUsuario(usuario string) error {
 	}
 	return nil
 }
+
+func (s *UsuarioServicio) ActualizarUsuario(user *modelo.Usuario) error {
+	col := s.db.Database(database).Collection(s.collection)
+	filter := bson.M{"usuario": user.Usuario}
+	update := bson.M{"$set": user}
+	_, err := col.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Println("Error actualizando usuario", "err", err)
+		return err
+	}
+	return nil
+}

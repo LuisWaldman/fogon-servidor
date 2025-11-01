@@ -57,6 +57,18 @@ func (n *ListaNegocio) GetLista(nombreLista string, nombreUsuario string) (*mode
 	return n.listaServicio.BuscarPorNombreYOwner(nombreLista, nombreUsuario)
 }
 
+func (n *ListaNegocio) GetListaCanciones(nombreLista string, nombreUsuario string) ([]*modelo.ItemIndiceCancion, error) {
+	lista, err := n.listaServicio.BuscarPorNombreYOwner(nombreLista, nombreUsuario)
+	if err != nil {
+		return nil, err
+	}
+	if lista == nil {
+		return nil, nil
+	}
+	canciones := n.itemindiceServicio.GetCancionesPorListaID(lista.ID)
+	return canciones, nil
+}
+
 func (n *ListaNegocio) AgregarCancionALista(nombreLista string, nombreUsuario string, item *modelo.ItemIndiceCancion) error {
 	lista, err := n.listaServicio.BuscarPorNombreYOwner(nombreLista, nombreUsuario)
 	if err != nil {
