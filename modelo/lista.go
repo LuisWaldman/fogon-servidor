@@ -6,9 +6,10 @@ import (
 )
 
 type Lista struct {
-	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Nombre string             `bson:"nombre" json:"nombre"`
-	Owner  string             `bson:"owner" json:"owner"`
+	ID             primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Nombre         string             `bson:"nombre" json:"nombre"`
+	Owner          string             `bson:"owner" json:"owner"`
+	TotalCanciones int                `bson:"total_canciones" json:"total_canciones"`
 }
 
 // UnmarshalBSON implementa bson.Unmarshaler para manejar ObjectID correctamente
@@ -48,7 +49,8 @@ func (l *Lista) UnmarshalBSON(data []byte) error {
 
 func NuevaLista(nombre string, owner string) *Lista {
 	return &Lista{
-		Nombre: nombre,
-		Owner:  owner,
+		Nombre:         nombre,
+		Owner:          owner,
+		TotalCanciones: 0,
 	}
 }

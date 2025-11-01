@@ -59,7 +59,22 @@ func (s *ListaServicio) BuscarPorNombreYOwner(nombre string, owner string) (*mod
 	}
 	return lista, nil
 }
-
+func (s *ListaServicio) ActualizarLista(lista *modelo.Lista) error {
+	col := s.db.Database(database).Collection(s.collection)
+	filter := bson.M{"_id": lista.ID}
+	update := bson.M{"$set": bson.M{
+		"nombre":          lista.Nombre,
+		"owner":           lista.Owner,
+		"total_canciones": lista.TotalCanciones,
+	}}
+	_, err := col.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Println("Error actualizando lista", "err", err)
+		return err
+	}
+	log.Println("Lista actualizada", lista.ID)
+	return nil
+}
 func (s *ListaServicio) BorrarPorID(id string) error {
 	col := s.db.Database(database).Collection(s.collection)
 	filter := bson.M{"_id": id}

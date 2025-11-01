@@ -25,9 +25,9 @@ func TestUsuarioNuevo_CrearYBuscar(t *testing.T) {
 	canciones, err := negocioUsuario.GetCancionesPorUsuario(user.Usuario)
 	assert.Nil(t, err, "Error al obtener canciones: %v", err)
 	assert.Equal(t, 0, len(canciones), "Se esperaban 0 canciones para el usuario")
-	listas, err := negocioUsuario.GetListasPorUsuario(user.Usuario)
-	assert.Nil(t, err, "Error al obtener listas: %v", err)
-	assert.Equal(t, 0, len(listas), "Se esperaban 0 listas para el usuario")
+	//listas, err := negocioUsuario.GetListasPorUsuario(user.Usuario)
+	//assert.Nil(t, err, "Error al obtener listas: %v", err)
+	//assert.Equal(t, 0, len(listas), "Se esperaban 0 listas para el usuario")
 
 	// Aquí iría la lógica para crear un nuevo usuario
 	// GetCancionesPorUsuario GetListasPorUsuario

@@ -33,7 +33,3 @@ func (n *UsuarioNegocio) BuscarPorNombre(nombreUsuario string) (*modelo.Usuario,
 func (n *UsuarioNegocio) GetCancionesPorUsuario(nombreUsuario string) ([]modelo.Cancion, error) {
 	return n.cancionServicio.BuscarPorOwner(nombreUsuario)
 }
-
-func (n *UsuarioNegocio) GetListasPorUsuario(nombreUsuario string) ([]modelo.Lista, error) {
-	return n.listaServicio.BuscarPorOwner(nombreUsuario)
-}
