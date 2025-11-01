@@ -5,6 +5,7 @@ import (
 )
 
 type ItemIndiceCancion struct {
+	ID      primitive.ObjectID `bson:"id" json:"id"`
 	ListaID primitive.ObjectID `bson:"listaId" json:"listaId"`
 	Orden   int                `bson:"orden" json:"orden"`
 
@@ -30,6 +31,10 @@ type ItemIndiceCancion struct {
 
 func NewItemIndiceCancion(cancion string, banda string) *ItemIndiceCancion {
 	return &ItemIndiceCancion{
+		ID:             primitive.NewObjectID(),
+		OrigenUrl:      "",
+		FileName:       "",
+		Usuario:        "",
 		Cancion:        cancion,
 		Banda:          banda,
 		Acordes:        "",
