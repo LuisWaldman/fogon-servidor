@@ -87,7 +87,19 @@ func TestRenombrarLista(t *testing.T) {
 	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
 	servicio := NuevoListaServicio(client)
 
-	// Limpiar si existen las listas de prueba
+	// Crear la lista con el nombre original
+	err = servicio.CrearLista(nombreOriginal, ownerTest)
+	assert.Nil(t, err, "Error al crear lista: %v", err)
+
+	// Buscar la lista creada
+	listaOriginal, err := servicio.BuscarPorNombreYOwner(nombreOriginal, ownerTest)
+	assert.Nil(t, err, "Error al buscar lista original: %v", err)
+	assert.NotNil(t, listaOriginal, "Lista original no existe")
+
+	// Renombrar la lista
+	listaOriginal.Nombre = nombreNuevo
+	err = servicio.ActualizarLista(listaOriginal)
+	assert.Nil(t, err, "Error al renombrar lista: %v", err)
 
 	// Verificar que existe la lista con el nuevo nombre
 	listaRenombrada, err := servicio.BuscarPorNombreYOwner(nombreNuevo, ownerTest)
