@@ -22,8 +22,9 @@ func NuevoListaServicio(db *mongo.Client) *ListaServicio {
 	}
 }
 
-func (s *ListaServicio) CrearLista(lista *modelo.Lista) error {
+func (s *ListaServicio) CrearLista(Nombre string, Owner string) error {
 	col := s.db.Database(database).Collection(s.collection)
+	lista := modelo.NuevaLista(Nombre, Owner)
 	inserta, err := col.InsertOne(context.TODO(), lista)
 	if err != nil {
 		log.Println("Error creando lista", "err", err)
@@ -33,7 +34,7 @@ func (s *ListaServicio) CrearLista(lista *modelo.Lista) error {
 	return nil
 }
 
-func (s *ListaServicio) BuscarPorNombreYOwner(owner string, nombre string) (*modelo.Lista, error) {
+func (s *ListaServicio) BuscarPorNombreYOwner(nombre string, owner string) (*modelo.Lista, error) {
 	col := s.db.Database(database).Collection(s.collection)
 	filter := bson.M{"owner": owner, "nombre": nombre}
 	cursor, err := col.Find(context.TODO(), filter)

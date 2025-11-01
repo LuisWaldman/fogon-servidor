@@ -1,6 +1,13 @@
 package modelo
 
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 type ItemIndiceCancion struct {
+	ListaID primitive.ObjectID `bson:"listaId" json:"listaId"`
+	Orden   int                `bson:"orden" json:"orden"`
+
 	OrigenUrl      string   `bson:"origenUrl" json:"origenUrl"`
 	FileName       string   `bson:"fileName" json:"fileName"`
 	Usuario        string   `bson:"usuario" json:"usuario"`

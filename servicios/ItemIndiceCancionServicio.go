@@ -9,21 +9,21 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type ListaCancionServicio struct {
+type ItemIndiceCancionServicio struct {
 	db         *mongo.Client
 	collection string
 }
 
-func NuevoListaCancionServicio(db *mongo.Client) *ListaCancionServicio {
-	return &ListaCancionServicio{
+func NuevoItemIndiceCancionServicio(db *mongo.Client) *ItemIndiceCancionServicio {
+	return &ItemIndiceCancionServicio{
 		db:         db,
 		collection: "listaCanciones",
 	}
 }
 
-func (s *ListaCancionServicio) AgregarCancion(listaCancion *modelo.ListaCancion) error {
+func (s *ItemIndiceCancionServicio) AgregarCancion(item *modelo.ItemIndiceCancion) error {
 	col := s.db.Database(database).Collection(s.collection)
-	inserta, err := col.InsertOne(context.TODO(), listaCancion)
+	inserta, err := col.InsertOne(context.TODO(), item)
 	if err != nil {
 		log.Println("Error agregando canción a lista", "err", err)
 		return err

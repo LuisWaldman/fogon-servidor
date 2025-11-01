@@ -13,14 +13,20 @@ func TestAgregarLista(t *testing.T) {
 	ownerTest := "usuario_test"
 
 	client, err := datos.ConnectDB()
+	itemListaServicio := NuevoItemIndiceCancionServicio(client)
+	listaservicio := NuevoListaServicio(client)
 	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
-	servicio := NuevoListaServicio(client)
-	lista, err := servicio.BuscarPorNombreYOwner(nombreLista, ownerTest)
+	lista, err := listaservicio.BuscarPorNombreYOwner(nombreLista, ownerTest)
+	if lista == nil {
+		listaservicio.CrearLista(nombreLista, ownerTest)
+		lista, err = listaservicio.BuscarPorNombreYOwner(nombreLista, ownerTest)
+	}
+	assert.Nil(t, err, "Error al buscar la lista: %v", err)
+	assert.NotNil(t, lista, "Error al buscar la lista: %v", err)
 
 	// Limpiar si existen las listas de prueba
 	item := modelo.NewItemIndiceCancion("Canción de Prueba", "Banda de Prueba")
-	listaCancion := modelo.NuevaListaCancion(lista.ID, item, 0)
-	cancionServicio := NuevoListaCancionServicio(client)
-	cancionServicio.AgregarCancion(listaCancion)
+	item.ListaID = lista.ID
+	itemListaServicio.AgregarCancion(item)
 
 }
