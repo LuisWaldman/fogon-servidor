@@ -24,6 +24,10 @@ func (n *ListaNegocio) NuevaLista(nombre string, owner string) error {
 }
 
 func (n *ListaNegocio) BorrarPorID(id string) error {
+	err := n.itemindiceServicio.BorrarPorListaID(id)
+	if err != nil {
+		return err
+	}
 	return n.listaServicio.BorrarPorID(id)
 }
 
@@ -33,12 +37,20 @@ func (n *ListaNegocio) NuevaListaForzarCreacion(nombre string, owner string) err
 		return err
 	}
 	if lista != nil {
-		err = n.BorrarPorID(lista.ID.String())
+		err = n.BorrarPorID(lista.ID.Hex())
+
 		if err != nil {
 			return err
 		}
 	}
 	return n.listaServicio.CrearLista(nombre, owner)
+}
+func (n *ListaNegocio) BorrarLista(nombreLista string, nombreUsuario string) error {
+	lista, _ := n.listaServicio.BuscarPorNombreYOwner(nombreLista, nombreUsuario)
+	if lista != nil {
+		return n.BorrarPorID(lista.ID.Hex())
+	}
+	return nil
 }
 
 func (n *ListaNegocio) GetLista(nombreLista string, nombreUsuario string) (*modelo.Lista, error) {

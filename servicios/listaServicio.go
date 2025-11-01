@@ -7,6 +7,7 @@ import (
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -66,8 +67,11 @@ func (s *ListaServicio) ActualizarLista(lista *modelo.Lista) error {
 }
 func (s *ListaServicio) BorrarPorID(id string) error {
 	col := s.db.Database(database).Collection(s.collection)
-	filter := bson.M{"_id": id}
-	_, err := col.DeleteOne(context.TODO(), filter)
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = col.DeleteOne(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		log.Println("Error borrando lista", "err", err)
 		return err
