@@ -70,17 +70,7 @@ func (controller *ListaController) Get(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
 		return
 	}
-
-	if len(listas) == 0 {
-		c.JSON(http.StatusOK, []string{})
-		return
-	}
-
-	nombreListas := make([]string, len(listas))
-	for i, lista := range listas {
-		nombreListas[i] = lista.Nombre
-	}
-	c.JSON(http.StatusOK, nombreListas)
+	c.JSON(http.StatusOK, listas)
 }
 
 // Put actualiza/renombra una lista

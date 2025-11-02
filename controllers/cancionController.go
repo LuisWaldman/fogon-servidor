@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
+	"github.com/LuisWaldman/fogon-servidor/negocio"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 
 	"github.com/LuisWaldman/fogon-servidor/aplicacion"
@@ -13,12 +14,14 @@ import (
 
 type CancionController struct {
 	cancionServicio *servicios.CancionServicio
+	usuarioNegocio  *negocio.UsuarioNegocio
 	aplicacion      *aplicacion.Aplicacion
 }
 
-func NuevoCancionController(cancionServicio *servicios.CancionServicio, aplicacion *aplicacion.Aplicacion) *CancionController {
+func NuevoCancionController(cancionServicio *servicios.CancionServicio, usuarioNegocio *negocio.UsuarioNegocio, aplicacion *aplicacion.Aplicacion) *CancionController {
 	return &CancionController{
 		cancionServicio: cancionServicio,
+		usuarioNegocio:  usuarioNegocio,
 		aplicacion:      aplicacion,
 	}
 }
@@ -80,13 +83,7 @@ func (controller *CancionController) Post(c *gin.Context) {
 	user, _ := c.Get("userID")
 	musico, _ := controller.aplicacion.BuscarMusicoPorID(user.(int))
 	cancion.Owner = musico.Usuario
-
-	err := controller.cancionServicio.CrearCancion(cancion)
-	if err != nil {
-		log.Println("Error guardando canción:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
-		return
-	}
+	controller.usuarioNegocio.AgregarCancion(musico.Usuario, &cancion)
 
 	log.Println("Canción guardada exitosamente:", cancion.NombreArchivo, "Owner:", cancion.Owner)
 	c.JSON(http.StatusOK, gin.H{"message": "Canción guardada exitosamente"})

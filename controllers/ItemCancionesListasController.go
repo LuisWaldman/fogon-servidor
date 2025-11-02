@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/LuisWaldman/fogon-servidor/aplicacion"
@@ -59,22 +60,32 @@ func (controller *ItemCancionesListasController) GetCancionesLista(c *gin.Contex
 }
 
 func (controller *ItemCancionesListasController) PostCancionesLista(c *gin.Context) {
-	nombreLista := c.Query("lista")
+	nombreLista := c.Query("nombreLista")
 	owner := c.Query("owner")
 
 	if owner == "" {
 		// Si no se proporciona owner, usar el del token de autenticación
-		userID, exists := c.Get("userID")
-		if !exists {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Parámetro 'owner' requerido"})
+		user, _ := c.Get("userID")
+		musico, encuentra := controller.aplicacion.BuscarMusicoPorID(user.(int))
+		if !encuentra {
+			log.Println("No se encontró el músico con ID:", user)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "No se encontró el músico"})
 			return
 		}
-		owner = userID.(string)
+		owner = musico.Usuario
 	}
-	cancion := "cancionEjemplo"
-	banda := "bandaEjemplo"
-	item := modelo.NewItemIndiceCancion(cancion, banda)
 
-	controller.usuarioNegocio.AgregarCancionALista(nombreLista, owner, item)
+	var item modelo.ItemIndiceCancion
+	if err := c.ShouldBindJSON(&item); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		return
+	}
+
+	err := controller.usuarioNegocio.AgregarCancionALista(nombreLista, owner, &item)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"status": "canción agregada"})
 }

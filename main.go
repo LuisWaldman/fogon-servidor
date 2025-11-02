@@ -107,7 +107,7 @@ func main() {
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
 	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
-	constroladorCancion := controllers.NuevoCancionController(cancionServicio, MyApp)
+	constroladorCancion := controllers.NuevoCancionController(cancionServicio, usuarioNegocio, MyApp)
 
 	controladorLista := controllers.NuevoListaController(usuarioNegocio, MyApp)
 	controladorItemIndice := controllers.NuevoItemCancionesListasController(usuarioNegocio, MyApp)

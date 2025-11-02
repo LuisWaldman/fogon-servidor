@@ -9,7 +9,7 @@ type ItemIndiceCancion struct {
 	ListaID primitive.ObjectID `bson:"listaId" json:"listaId"`
 	Orden   int                `bson:"orden" json:"orden"`
 
-	OrigenUrl      string   `bson:"origenUrl" json:"origenUrl"`
+	OrigenUrl      string   `bson:"origenUrl" json:"origen"`
 	FileName       string   `bson:"fileName" json:"fileName"`
 	Usuario        string   `bson:"usuario" json:"usuario"`
 	Cancion        string   `bson:"cancion" json:"cancion"`
