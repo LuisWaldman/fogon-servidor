@@ -27,6 +27,16 @@ func (n *UsuarioNegocio) CrearUsuario(nombreUsuario string) error {
 	return n.usuarioServicio.CrearUsuario(user)
 }
 
+func (n *UsuarioNegocio) CrearUsuarioYContraseña(nombreUsuario string, contraseña string) error {
+	user := modelo.Usuario{
+		Usuario: nombreUsuario,
+		Clave:   contraseña,
+		Listas:  []string{},
+	}
+	n.listaNegocio.NuevaListaForzarCreacion(nombreUsuario, "FOGON@FOGON")
+	return n.usuarioServicio.CrearUsuario(user)
+}
+
 func (n *UsuarioNegocio) BuscarPorUsuario(nombreUsuario string) (*modelo.Usuario, error) {
 	return n.usuarioServicio.BuscarPorUsuario(nombreUsuario)
 }
