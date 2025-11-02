@@ -45,13 +45,9 @@ func (controller *ItemCancionesListasController) GetCancionesLista(c *gin.Contex
 	nombreLista := c.Query("lista")
 	owner := c.Query("owner")
 	if owner == "" {
-		// Si no se proporciona owner, usar el del token de autenticación
-		userID, exists := c.Get("userID")
-		if !exists {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Parámetro 'owner' requerido"})
-			return
-		}
-		owner = userID.(string)
+		user, _ := c.Get("userID")
+		musico, _ := controller.aplicacion.BuscarMusicoPorID(user.(int))
+		owner = musico.Usuario
 	}
 
 	listas := controller.usuarioNegocio.GetCancionesLista(nombreLista, owner)
@@ -60,7 +56,7 @@ func (controller *ItemCancionesListasController) GetCancionesLista(c *gin.Contex
 }
 
 func (controller *ItemCancionesListasController) PostCancionesLista(c *gin.Context) {
-	nombreLista := c.Query("nombreLista")
+	nombreLista := c.Query("lista")
 	owner := c.Query("owner")
 
 	if owner == "" {
