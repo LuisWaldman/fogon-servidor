@@ -108,5 +108,7 @@ func BuildFromCancion(cancion *Cancion) *ItemIndiceCancion {
 	}
 
 	item.Owner = cancion.Owner
+	item.FileName = cancion.NombreArchivo
+	item.OrigenUrl = "server"
 	return item
 }

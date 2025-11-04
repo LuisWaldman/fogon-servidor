@@ -60,7 +60,10 @@ func (n *UsuarioNegocio) BorrarLista(nombreLista string, owner string) error {
 }
 
 func (n *UsuarioNegocio) AgregarCancion(nombreUsuario string, cancion *modelo.Cancion) error {
-	n.listaNegocio.AgregarCancionALista(nombreUsuario, "FOGON@FOGON", modelo.BuildFromCancion(cancion))
+	item := modelo.BuildFromCancion(cancion)
+	item.Owner = nombreUsuario
+	item.OrigenUrl = "server"
+	n.listaNegocio.AgregarCancionALista(nombreUsuario, "FOGON@FOGON", item)
 	return n.cancionServicio.CrearCancion(cancion)
 }
 
