@@ -72,6 +72,15 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}
 	})
 
+	newSocket.On("sincronizarReproduccion", func(datas ...any) {
+		if len(datas) == 2 {
+			compas := datas[0].(float64)
+			delayms := datas[1].(float64)
+			log.Println("sincronizarReproduccion - Sesion:", compas, "Delay:", delayms)
+			newMusico.SincronizarReproduccion(int(compas), delayms)
+		}
+	})
+
 	newSocket.On("detenerReproduccion", func(datas ...any) {
 		log.Println("detenerReproduccion - Sesion:")
 		newMusico.DetenerReproduccion()

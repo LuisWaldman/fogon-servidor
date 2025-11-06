@@ -102,6 +102,14 @@ func (musico *Musico) IniciarReproduccion(compas int, delay float64) {
 	musico.Sesion.IniciarReproduccion(compas, delay)
 }
 
+func (musico *Musico) SincronizarReproduccion(compas int, delay float64) {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.SincronizarReproduccion(compas, delay)
+}
+
 func (musico *Musico) DetenerReproduccion() {
 	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
