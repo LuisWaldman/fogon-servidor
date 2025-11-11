@@ -13,8 +13,8 @@ import (
 func TestCrearUsuarioServicio(t *testing.T) {
 	usuario := &modelo.Usuario{}
 	usuario.Modologin = "USERPASS"
-	usuario.Usuario = "servicio1"
-	usuario.Clave = "clave1"
+	usuario.Usuario = "luis"
+	usuario.Clave = "luis"
 	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al crear base de datos: %v", err)
 	servicio := NuevoUsuarioServicio(client)
