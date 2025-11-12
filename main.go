@@ -10,6 +10,7 @@ import (
 	Config "github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/controllers"
 	"github.com/LuisWaldman/fogon-servidor/datos"
+	"github.com/LuisWaldman/fogon-servidor/negocio"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
 		c.Header("Access-Control-Allow-Origin", AppConfig.Site)
-		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		// Manejar preflight requests
@@ -89,19 +90,29 @@ func main() {
 	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
 
 	perfilServicio := servicios.NuevoPerfilServicio(client)
+	listaServicio := servicios.NuevoListaServicio(client)
+	//listaCancionServicio := servicios.NuevoListaCancionServicio(client)
+	cancionServicio := servicios.NuevoCancionServicio(client)
+	itemIndiceServicio := servicios.NuevoItemIndiceCancionServicio(client)
+	//indiceServicio := servicios.NuevoIndiceServicio(client)
+	usuarioServicio := servicios.NuevoUsuarioServicio(client)
+
+	//listaNegocio := negocio.NuevoListaNegocio(cancionServicio, listaServicio, itemIndiceServicio)
+	usuarioNegocio := negocio.NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio, itemIndiceServicio)
+
 	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
 	constroladorRTC := controllers.NuevoRTCController(MyApp)
 	constroladorAnswerRTC := controllers.NuevoAnswerRTCController(MyApp)
 	constroladorUpdateRTC := controllers.NuevoUpdateRTCController(MyApp)
 	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
 	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
-
 	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
+	constroladorCancion := controllers.NuevoCancionController(cancionServicio, usuarioNegocio, MyApp)
 
-	cancionServicio := servicios.NuevoCancionServicio(client)
-	constroladorCancion := controllers.NuevoCancionController(cancionServicio)
+	controladorLista := controllers.NuevoListaController(usuarioNegocio, MyApp)
+	controladorItemIndice := controllers.NuevoItemCancionesListasController(usuarioNegocio, MyApp)
+	//controladorListaCancion := controllers.NuevoListaCancionController(listaCancionServicio, listaServicio, indiceServicio, MyApp)
 
-	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	loginRepo := logueadores.NewLogeadorRepository()
 	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
 
@@ -129,10 +140,22 @@ func main() {
 
 	router.GET("/sesiones", constroladorSesiones.Get)
 	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
-	router.GET("/cancion", constroladorCancion.Get)
-	router.POST("/cancion", constroladorCancion.Post)
 	router.GET("/cancionsesion", constroladorCancionSesion.Get)
 	router.POST("/cancionsesion", constroladorCancionSesion.Post)
+
+	// Rutas para listas
+	router.GET("/lista", controladorLista.Get)
+	router.POST("/lista", controladorLista.Post)
+	router.PUT("/lista", controladorLista.Put)
+	router.DELETE("/lista", controladorLista.Delete)
+
+	router.GET("/cancion", constroladorCancion.Get)
+	router.POST("/cancion", constroladorCancion.Post)
+	router.DELETE("/cancion", constroladorCancion.Delete)
+
+	router.GET("/itemcancionlista", controladorItemIndice.GetCancionesLista)
+	router.POST("/itemcancionlista", controladorItemIndice.PostCancionesLista)
+	router.GET("/itemcancionusuario", controladorItemIndice.GetCancionesPorUsuario)
 
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }

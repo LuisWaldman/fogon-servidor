@@ -6,7 +6,7 @@ import (
 
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -54,6 +54,18 @@ func (s *UsuarioServicio) BorrarPorUsuario(usuario string) error {
 	_, err := col.DeleteOne(context.TODO(), bson.M{"usuario": usuario})
 	if err != nil {
 		log.Println("Error borrando usuario", "err", err)
+		return err
+	}
+	return nil
+}
+
+func (s *UsuarioServicio) ActualizarUsuario(user *modelo.Usuario) error {
+	col := s.db.Database(database).Collection(s.collection)
+	filter := bson.M{"usuario": user.Usuario}
+	update := bson.M{"$set": user}
+	_, err := col.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Println("Error actualizando usuario", "err", err)
 		return err
 	}
 	return nil

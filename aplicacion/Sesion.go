@@ -4,7 +4,6 @@ import (
 	"log"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/LuisWaldman/fogon-servidor/modelo"
 	// Adjust the import path as necessary
@@ -84,20 +83,21 @@ func (sesion *Sesion) ActualizarUsuarios() {
 	sesion.Mutex.Unlock()
 }
 
-func (sesion *Sesion) IniciarReproduccion(compas int, delay float64) {
+func (sesion *Sesion) SincronizarReproduccion(compas int, time float64) {
+	sesion.compas = compas
+	sesion.inicio = time
+	sesion.Mutex.Lock()
+	for _, musico := range sesion.musicos {
+		musico.emit("sincronizar", compas, sesion.inicio)
+	}
+	sesion.Mutex.Unlock()
+}
+
+func (sesion *Sesion) IniciarReproduccion(compas int, time float64) {
 	sesion.compas = compas
 	sesion.estado = "reproduciendo"
-
-	now := time.Now()
-	_, min, sec := now.Clock()
-	nsec := now.Nanosecond()
-	elapsedMicrosSinceHourStart := (((min*60 + sec) * 1000000) + (nsec / 1000)) / 1000
-	time := float64(elapsedMicrosSinceHourStart)
-
-	sesion.inicio = time + delay
-	log.Print("Hora para tomar: ", time, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
+	sesion.inicio = time
 	sesion.Mutex.Lock()
-	log.Print("Hora toma: ", time, " - Inicio: ", sesion.inicio, " - Compas: ", compas, " - Delay: ", delay)
 	for _, musico := range sesion.musicos {
 		musico.emit("cancionIniciada", compas, sesion.inicio)
 	}

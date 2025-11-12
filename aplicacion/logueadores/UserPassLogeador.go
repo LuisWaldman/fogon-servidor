@@ -1,7 +1,6 @@
 package logueadores
 
 import (
-	"github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/LuisWaldman/fogon-servidor/servicios"
 )
 
@@ -19,14 +18,16 @@ func NewUserPassLogeador(usuarioServicio *servicios.UsuarioServicio) *UserPassLo
 func (l *UserPassLogeador) Login(par_1 string, par_2 string) bool {
 	usuario, _ := l.usuarioServicio.BuscarPorUsuario(par_1)
 	if usuario.Encontrado == false {
-		usuaio := modelo.Usuario{
-			Usuario:   par_1,
-			Clave:     par_2,
-			Modologin: "UserPass",
-		}
+		return false // Usuario no encontrado
+		/*
+			usuaio := modelo.Usuario{
+				Usuario:   par_1,
+				Clave:     par_2,
+				Modologin: "UserPass",
+			}
 
-		l.usuarioServicio.CrearUsuario(usuaio)
-		return true // Usuario creado exitosamente
+			l.usuarioServicio.CrearUsuario(usuaio)
+		*/
 	}
 
 	// Si el usuario ya existe, verificamos la clave
