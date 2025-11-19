@@ -10,13 +10,15 @@ import (
 )
 
 type Sesion struct {
-	nombre  string
-	musicos map[int]*Musico
-	estado  string
-	inicio  float64
-	compas  int
-	Mutex   *sync.Mutex
-	cancion modelo.Cancion
+	nombre     string
+	musicos    map[int]*Musico
+	estado     string
+	inicio     float64
+	compas     int
+	Mutex      *sync.Mutex
+	cancion    modelo.Cancion
+	lista      []modelo.ItemIndiceCancion
+	nroCancion int
 }
 
 func mismaRed(ipsA, ipsB []string) bool {
@@ -181,4 +183,100 @@ func (sesion *Sesion) SalirSesion(musico *Musico) {
 		}
 	}
 	sesion.Mutex.Unlock()
+}
+
+// Tocar agrega una canción a la lista en la posición siguiente a nroCancion y le suma 1
+// Si la lista está vacía, la agrega y pone nroCancion = 0
+func (sesion *Sesion) Tocar(cancion modelo.ItemIndiceCancion) {
+	sesion.Mutex.Lock()
+
+	if len(sesion.lista) == 0 {
+		// Si la lista está vacía, agregar la canción y establecer nroCancion = 0
+		sesion.lista = append(sesion.lista, cancion)
+		sesion.nroCancion = 0
+	} else {
+		// Insertar la canción en la posición siguiente a nroCancion
+		insertPos := sesion.nroCancion + 1
+		if insertPos > len(sesion.lista) {
+			insertPos = len(sesion.lista)
+		}
+
+		// Crear nueva slice con espacio para la nueva canción
+		nuevaLista := make([]modelo.ItemIndiceCancion, len(sesion.lista)+1)
+		copy(nuevaLista[:insertPos], sesion.lista[:insertPos])
+		nuevaLista[insertPos] = cancion
+		copy(nuevaLista[insertPos+1:], sesion.lista[insertPos:])
+
+		sesion.lista = nuevaLista
+		sesion.nroCancion++
+	}
+
+	// Notificar a todos los músicos que la lista cambió
+	for _, musico := range sesion.musicos {
+		musico.emit("listacambiada")
+	}
+	sesion.Mutex.Unlock()
+}
+
+// TocarNro cambia el número de canción actual
+func (sesion *Sesion) TocarNro(numero int) {
+	sesion.Mutex.Lock()
+
+	if numero >= 0 && numero < len(sesion.lista) {
+		sesion.nroCancion = numero
+		// Notificar a todos los músicos que el número cambió
+		for _, musico := range sesion.musicos {
+			musico.emit("nrocambiado")
+		}
+	}
+	sesion.Mutex.Unlock()
+}
+
+// SetLista establece la lista de canciones
+func (sesion *Sesion) SetLista(lista []modelo.ItemIndiceCancion) {
+	sesion.Mutex.Lock()
+
+	sesion.lista = lista
+	// Resetear nroCancion si la nueva lista está vacía o el índice actual es inválido
+	if len(lista) == 0 || sesion.nroCancion >= len(lista) {
+		sesion.nroCancion = 0
+	}
+
+	// Notificar a todos los músicos que la lista cambió
+	for _, musico := range sesion.musicos {
+		musico.emit("listacambiada")
+	}
+	sesion.Mutex.Unlock()
+}
+
+// AgregarItem agrega una canción al final de la lista sin cambiar el número de canción actual
+func (sesion *Sesion) AgregarItem(cancion modelo.ItemIndiceCancion) {
+	sesion.Mutex.Lock()
+
+	// Agregar la canción al final de la lista
+	sesion.lista = append(sesion.lista, cancion)
+
+	// Notificar a todos los músicos que la lista cambió
+	for _, musico := range sesion.musicos {
+		musico.emit("listacambiada")
+	}
+	sesion.Mutex.Unlock()
+}
+
+// GetLista obtiene la lista de canciones
+func (sesion *Sesion) GetLista() []modelo.ItemIndiceCancion {
+	sesion.Mutex.Lock()
+	defer sesion.Mutex.Unlock()
+
+	// Retornar una copia de la lista para evitar modificaciones concurrentes
+	lista := make([]modelo.ItemIndiceCancion, len(sesion.lista))
+	copy(lista, sesion.lista)
+	return lista
+}
+
+// GetNroCancion obtiene el número de canción actual
+func (sesion *Sesion) GetNroCancion() int {
+	sesion.Mutex.Lock()
+	defer sesion.Mutex.Unlock()
+	return sesion.nroCancion
 }

@@ -157,5 +157,18 @@ func main() {
 	router.POST("/itemcancionlista", controladorItemIndice.PostCancionesLista)
 	router.GET("/itemcancionusuario", controladorItemIndice.GetCancionesPorUsuario)
 
+	controladorListaSesion := controllers.NuevoListaSesionController(MyApp)
+	controladorNumeroCancion := controllers.NuevoNumeroCancionSesionController(MyApp)
+	controladorReproductor := controllers.NuevoReproductorSesionController(MyApp)
+
+	router.GET("/listasesion", controladorListaSesion.Get)
+	router.POST("/listasesion", controladorListaSesion.Post)
+	router.POST("/listasesionitem", controladorListaSesion.PostItem)
+	router.GET("/numerocancion", controladorNumeroCancion.Get)
+	router.POST("/numerocancion", controladorNumeroCancion.Post)
+	router.PUT("/numerocancion", controladorNumeroCancion.Put)
+	router.POST("/tocar", controladorReproductor.PostTocar)
+	router.POST("/tocarnro", controladorReproductor.PostTocarNro)
+	router.PUT("/tocarnro", controladorReproductor.PutTocarNro)
 	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
 }
