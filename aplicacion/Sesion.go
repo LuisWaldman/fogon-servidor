@@ -154,7 +154,10 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 	if sesion.musicos == nil {
 		sesion.musicos = make(map[int]*Musico)
 		musico.SetRolSesion("director")
-
+	} else {
+		if len(sesion.musicos) == 0 {
+			musico.SetRolSesion("director")
+		}
 	}
 	sesion.musicos[musico.ID] = musico
 	if sesion.estado == "reproduciendo" {
