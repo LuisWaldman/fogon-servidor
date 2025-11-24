@@ -77,9 +77,6 @@ func BuildFromCancion(cancion *Cancion) *ItemIndiceCancion {
 		if compasUnidad, ok := datosJSON["compasUnidad"].(float64); ok {
 			item.CompasUnidad = int(compasUnidad)
 		}
-		if totalCompases, ok := datosJSON["totalCompases"].(float64); ok {
-			item.TotalCompases = int(totalCompases)
-		}
 		if etiquetas, ok := datosJSON["etiquetas"].([]interface{}); ok {
 			for _, etiqueta := range etiquetas {
 				if etiquetaStr, ok := etiqueta.(string); ok {
@@ -101,6 +98,26 @@ func BuildFromCancion(cancion *Cancion) *ItemIndiceCancion {
 					}
 				}
 				item.CantAcordes = totalAcordes
+			}
+
+			// Calcular totalCompases basándose en ordenPartes
+			if ordenPartes, ok := acordes["ordenPartes"].([]interface{}); ok {
+				if partes, ok := acordes["partes"].([]interface{}); ok {
+					totalCompases := 0
+					for _, ordenIdx := range ordenPartes {
+						if idx, ok := ordenIdx.(float64); ok {
+							parteIdx := int(idx)
+							if parteIdx < len(partes) {
+								if parteMap, ok := partes[parteIdx].(map[string]interface{}); ok {
+									if acordesParte, ok := parteMap["acordes"].([]interface{}); ok {
+										totalCompases += len(acordesParte)
+									}
+								}
+							}
+						}
+					}
+					item.TotalCompases = totalCompases
+				}
 			}
 		}
 	}
