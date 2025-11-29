@@ -105,12 +105,27 @@ func (sesion *Sesion) IniciarReproduccion(compas int, time float64) {
 	}
 	sesion.Mutex.Unlock()
 }
-
-func (sesion *Sesion) DetenerReproduccion() {
+func (sesion *Sesion) NroMusico(musico *Musico) int {
 	sesion.Mutex.Lock()
+	defer sesion.Mutex.Unlock()
+	nro := 0
+	for _, m := range sesion.musicos {
+		if m.ID < musico.ID {
+			nro++
+		}
+	}
+	return nro
+
+}
+
+func (sesion *Sesion) CambiarEstado(musico *Musico, estado string) {
+	nro := sesion.NroMusico(musico)
+	sesion.estado = estado
+	sesion.Mutex.Lock()
+
 	for _, musico := range sesion.musicos {
-		musico.emit("cancionDetenida")
-		sesion.estado = "pausada"
+		musico.emit("cancionCambioEstado", estado, nro)
+
 	}
 	sesion.Mutex.Unlock()
 

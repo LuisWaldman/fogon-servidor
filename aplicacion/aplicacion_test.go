@@ -28,7 +28,7 @@ func TestCreoSesion(t *testing.T) {
 	}
 
 	if sesion.nombre != sesionID {
-		t.Errorf("Los datos de la sesión no coinciden: got %v, want %s, %f, %f", sesion, sesionID, latitud, longitud)
+		t.Errorf("Los datos de la sesión no coinciden: got %v, want %s", sesion, sesionID)
 	}
 	otromusico := NuevoMusico(newSocket, *loginRepo)
 	app.AgregarMusico(otromusico)

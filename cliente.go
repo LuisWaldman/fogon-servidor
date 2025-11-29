@@ -81,9 +81,14 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 		}
 	})
 
-	newSocket.On("detenerReproduccion", func(datas ...any) {
-		log.Println("detenerReproduccion - Sesion:")
-		newMusico.DetenerReproduccion()
+	newSocket.On("cambiarEstado", func(datas ...any) {
+		log.Println("cambiarEstado - Sesion:")
+		if len(datas) == 1 {
+			estado := datas[0].(string)
+			log.Println("iniciarReproduccion - Sesion:", estado)
+			newMusico.CambiarEstado(estado)
+		}
+
 	})
 
 	newSocket.On("actualizarCompas", func(datas ...any) {

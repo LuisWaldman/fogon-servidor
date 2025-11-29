@@ -12,8 +12,30 @@ import (
 func TestUsuarioNuevo(t *testing.T) {
 	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
-	nombreUsuario := "luis"
-	contraseña := "luis"
+	nombreUsuario := "madre"
+	contraseña := "t"
+	usuarioServicio := servicios.NuevoUsuarioServicio(client)
+	cancionServicio := servicios.NuevoCancionServicio(client)
+	listaServicio := servicios.NuevoListaServicio(client)
+	itemServicio := servicios.NuevoItemIndiceCancionServicio(client)
+
+	// CREO NEGOCIO USUARIO
+	negocioUsuario := NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio, itemServicio)
+	negocioUsuario.BorrarPorUsuario(nombreUsuario)
+	negocioUsuario.CrearUsuarioYContraseña(nombreUsuario, contraseña)
+
+	user, err := negocioUsuario.BuscarPorUsuario(nombreUsuario)
+	assert.Nil(t, err, "Error al buscar usuario: %v", err)
+	assert.NotNil(t, user, "Usuario no encontrado")
+	assert.Equal(t, nombreUsuario, user.Usuario, "Nombre de usuario incorrecto")
+	assert.Equal(t, contraseña, user.Clave, "Clave de usuario incorrecta")
+}
+
+func TestBotNuevoConListas(t *testing.T) {
+	client, err := datos.ConnectDB()
+	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
+	nombreUsuario := "bot1"
+	contraseña := "b"
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
 	listaServicio := servicios.NuevoListaServicio(client)
@@ -30,6 +52,42 @@ func TestUsuarioNuevo(t *testing.T) {
 	assert.Equal(t, nombreUsuario, user.Usuario, "Nombre de usuario incorrecto")
 	assert.Equal(t, contraseña, user.Clave, "Clave de usuario incorrecta")
 
+	negocioUsuario.AgregarLista("tomados", nombreUsuario)
+	negocioUsuario.AgregarLista("obtenerYoutube", nombreUsuario)
+	negocioUsuario.AgregarLista("descargarAudio", nombreUsuario)
+	negocioUsuario.AgregarLista("procesarTexto", nombreUsuario)
+	negocioUsuario.AgregarLista("procesarAudio", nombreUsuario)
+	negocioUsuario.AgregarLista("procesarUltimo", nombreUsuario)
+	negocioUsuario.AgregarLista("conErrores", nombreUsuario)
+
+}
+
+func TestUsuaridoBotNuevo(t *testing.T) {
+	client, err := datos.ConnectDB()
+	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
+	nombreUsuario := "bot1"
+	contraseña := "b"
+	usuarioServicio := servicios.NuevoUsuarioServicio(client)
+	cancionServicio := servicios.NuevoCancionServicio(client)
+	listaServicio := servicios.NuevoListaServicio(client)
+	itemServicio := servicios.NuevoItemIndiceCancionServicio(client)
+
+	// CREO NEGOCIO USUARIO
+	negocioUsuario := NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio, itemServicio)
+	negocioUsuario.BorrarPorUsuario(nombreUsuario)
+	negocioUsuario.CrearUsuarioYContraseña(nombreUsuario, contraseña)
+
+	user, err := negocioUsuario.BuscarPorUsuario(nombreUsuario)
+	assert.Nil(t, err, "Error al buscar usuario: %v", err)
+	assert.NotNil(t, user, "Usuario no encontrado")
+	assert.Equal(t, nombreUsuario, user.Usuario, "Nombre de usuario incorrecto")
+	assert.Equal(t, contraseña, user.Clave, "Clave de usuario incorrecta")
+	negocioLista := NuevoListaNegocio(cancionServicio, listaServicio, itemServicio)
+
+	negocioLista.NuevaLista("tomados", nombreUsuario)
+	negocioLista.NuevaLista("obtenerYoutube", nombreUsuario)
+	negocioLista.NuevaLista("descargarAudio", nombreUsuario)
+	negocioLista.NuevaLista("procesarTexto", nombreUsuario)
 }
 
 func TestUsuarioNuevo_Crear(t *testing.T) {
