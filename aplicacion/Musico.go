@@ -102,12 +102,12 @@ func (musico *Musico) SalirSesion() {
 
 }
 
-func (musico *Musico) IniciarReproduccion(compas int, delay float64) {
+func (musico *Musico) IniciarReproduccion(compas int, momento float64) {
 	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
-	musico.Sesion.IniciarReproduccion(compas, delay)
+	musico.Sesion.IniciarReproduccion(compas, momento, musico)
 }
 
 func (musico *Musico) SincronizarReproduccion(compas int, delay float64) {

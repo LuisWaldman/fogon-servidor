@@ -94,17 +94,6 @@ func (sesion *Sesion) SincronizarReproduccion(compas int, time float64) {
 	}
 	sesion.Mutex.Unlock()
 }
-
-func (sesion *Sesion) IniciarReproduccion(compas int, time float64) {
-	sesion.compas = compas
-	sesion.estado = "reproduciendo"
-	sesion.inicio = time
-	sesion.Mutex.Lock()
-	for _, musico := range sesion.musicos {
-		musico.emit("cancionIniciada", compas, sesion.inicio)
-	}
-	sesion.Mutex.Unlock()
-}
 func (sesion *Sesion) NroMusico(musico *Musico) int {
 	sesion.Mutex.Lock()
 	defer sesion.Mutex.Unlock()
@@ -116,6 +105,19 @@ func (sesion *Sesion) NroMusico(musico *Musico) int {
 	}
 	return nro
 
+}
+
+func (sesion *Sesion) IniciarReproduccion(compas int, momento float64, musico *Musico) {
+
+	nro := sesion.NroMusico(musico)
+	sesion.compas = compas
+	sesion.estado = "reproduciendo"
+	sesion.inicio = momento
+	sesion.Mutex.Lock()
+	for _, musico := range sesion.musicos {
+		musico.emit("cancionIniciada", compas, sesion.inicio, nro)
+	}
+	sesion.Mutex.Unlock()
 }
 
 func (sesion *Sesion) CambiarEstado(musico *Musico, estado string) {

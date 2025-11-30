@@ -66,9 +66,9 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	newSocket.On("iniciarReproduccion", func(datas ...any) {
 		if len(datas) == 2 {
 			compas := datas[0].(float64)
-			delayms := datas[1].(float64)
-			log.Println("iniciarReproduccion - Sesion:", compas, "Delay:", delayms)
-			newMusico.IniciarReproduccion(int(compas), delayms)
+			momento := datas[1].(float64)
+			log.Println("iniciarReproduccion - Sesion:", compas, "Momento:", momento)
+			newMusico.IniciarReproduccion(int(compas), momento)
 		}
 	})
 
@@ -94,7 +94,7 @@ func nuevaConexion(clients []any, logRepo logueadores.LogeadorRepository) {
 	newSocket.On("actualizarCompas", func(datas ...any) {
 		if len(datas) == 1 {
 			compas := datas[0].(float64)
-			log.Println("iniciarReproduccion - Sesion:", compas)
+			log.Println("actualizarCompas - Sesion:", compas)
 			newMusico.ActualizarCompas(int(compas))
 		}
 	})
