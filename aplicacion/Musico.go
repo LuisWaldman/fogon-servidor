@@ -29,6 +29,14 @@ type Musico struct {
 	rolSesion string
 }
 
+func (musico *Musico) CambiarEstado(estado string) {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.CambiarEstado(musico, estado)
+}
+
 func (musico *Musico) ActualizarPerfil(perfil *modelo.Perfil) {
 	musico.Perfil = perfil
 	if musico.Sesion != nil {
@@ -94,12 +102,12 @@ func (musico *Musico) SalirSesion() {
 
 }
 
-func (musico *Musico) IniciarReproduccion(compas int, delay float64) {
+func (musico *Musico) IniciarReproduccion(compas int, momento float64) {
 	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
 		return
 	}
-	musico.Sesion.IniciarReproduccion(compas, delay)
+	musico.Sesion.IniciarReproduccion(compas, momento, musico)
 }
 
 func (musico *Musico) SincronizarReproduccion(compas int, delay float64) {
@@ -108,14 +116,6 @@ func (musico *Musico) SincronizarReproduccion(compas int, delay float64) {
 		return
 	}
 	musico.Sesion.SincronizarReproduccion(compas, delay)
-}
-
-func (musico *Musico) DetenerReproduccion() {
-	if musico.Sesion == nil {
-		musico.emit("error", "No session joined")
-		return
-	}
-	musico.Sesion.DetenerReproduccion()
 }
 
 func (musico *Musico) ActualizarCompas(compas int) {
