@@ -12,8 +12,8 @@ import (
 func TestUsuarioNuevo(t *testing.T) {
 	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
-	nombreUsuario := "nuevoUser"
-	contraseña := "t"
+	nombreUsuario := "luis"
+	contraseña := "l"
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
 	listaServicio := servicios.NuevoListaServicio(client)
@@ -34,7 +34,7 @@ func TestUsuarioNuevo(t *testing.T) {
 func TestBotNuevoConListas(t *testing.T) {
 	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
-	nombreUsuario := "bot12"
+	nombreUsuario := "bot1"
 	contraseña := "b"
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
@@ -58,6 +58,7 @@ func TestBotNuevoConListas(t *testing.T) {
 	negocioUsuario.AgregarLista("procesarTexto", nombreUsuario)
 	negocioUsuario.AgregarLista("procesarAudio", nombreUsuario)
 	negocioUsuario.AgregarLista("procesarUltimo", nombreUsuario)
+	negocioUsuario.AgregarLista("completadas", nombreUsuario)
 	negocioUsuario.AgregarLista("conErrores", nombreUsuario)
 
 }

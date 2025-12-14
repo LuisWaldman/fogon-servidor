@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type ItemIndiceCancionServicio struct {
@@ -25,12 +26,28 @@ func NuevoItemIndiceCancionServicio(db *mongo.Client) *ItemIndiceCancionServicio
 
 func (s *ItemIndiceCancionServicio) AgregarCancion(item *modelo.ItemIndiceCancion) error {
 	col := s.db.Database(database).Collection(s.collection)
-	inserta, err := col.InsertOne(context.TODO(), item)
+
+	// Filtro para buscar documentos con el mismo fileName y origenUrl
+	filter := bson.M{
+		"fileName":  item.FileName,
+		"origenUrl": item.OrigenUrl,
+	}
+
+	// Opciones para hacer upsert (update si existe, insert si no existe)
+	opts := options.Replace().SetUpsert(true)
+
+	resultado, err := col.ReplaceOne(context.TODO(), filter, item, opts)
 	if err != nil {
-		log.Println("Error agregando canción a lista", "err", err)
+		log.Println("Error agregando/actualizando canción en lista", "err", err)
 		return err
 	}
-	log.Println("Canción agregada a lista", inserta)
+
+	if resultado.UpsertedID != nil {
+		log.Println("Nueva canción insertada en lista", "id", resultado.UpsertedID)
+	} else {
+		log.Println("Canción actualizada en lista", "modificados", resultado.ModifiedCount)
+	}
+
 	return nil
 }
 

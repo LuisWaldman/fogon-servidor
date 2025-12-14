@@ -1,174 +1,51 @@
 package main
 
 import (
+	"context"
 	"log"
-	"net/http"
-	"strings"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	aplicacion "github.com/LuisWaldman/fogon-servidor/aplicacion"
-	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
-	Config "github.com/LuisWaldman/fogon-servidor/config"
-	"github.com/LuisWaldman/fogon-servidor/controllers"
-	"github.com/LuisWaldman/fogon-servidor/datos"
-	"github.com/LuisWaldman/fogon-servidor/negocio"
-	"github.com/LuisWaldman/fogon-servidor/servicios"
-
-	"github.com/gin-gonic/gin"
-	"github.com/zishang520/socket.io/v2/socket"
+	"github.com/LuisWaldman/fogon-servidor/server"
 )
 
-var AppConfig = Config.LoadConfiguration()
-
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		//c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
-		c.Header("Access-Control-Allow-Origin", AppConfig.Site)
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		// Manejar preflight requests
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusOK)
-			return
-		}
-
-		c.Next()
-	}
-}
-
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		if strings.HasPrefix(c.Request.URL.RequestURI(), "/socket.io/") {
-			c.Next()
-			return
-		}
-
-		if c.Request.Method == "GET" && c.Request.URL.Path == "/ntp" {
-			c.Next()
-			return
-		}
-
-		// Obtener el token del header Authorization
-
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token requerido"})
-			c.Abort()
-			return
-		}
-
-		// Extraer el token eliminando "Bearer "
-		token := strings.TrimPrefix(authHeader, "Bearer ")
-		userID, err := aplicacion.VerifyToken(token)
-		if err != nil {
-			log.Println("Error al verificar el token:", err)
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-			c.Abort()
-			return
-		}
-		c.Set("userID", userID) // Almacenar el ID de usuario para su uso posterior
-		c.Set("token", token)   // Puedes almacenar el token para su uso posterior
-
-		c.Next()
-	}
-}
-
-var MyApp = aplicacion.NuevoAplicacion()
-
 func main() {
-	router := gin.Default()
-	router.Use(corsMiddleware())
-	router.Use(AuthMiddleware())
-	gin.SetMode(gin.ReleaseMode)
+	// Crear contexto para manejo de shutdown graceful
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	client, err := datos.ConnectDB()
+	// Crear el servidor con todas las dependencias
+	srv, err := server.NewServer(ctx)
 	if err != nil {
-		log.Fatalln("Error al conectar a la base de datos:", err)
-		return
-	}
-	log.Printf("Nivel de log configurado: %s", AppConfig.LogLevel)
-
-	perfilServicio := servicios.NuevoPerfilServicio(client)
-	listaServicio := servicios.NuevoListaServicio(client)
-	//listaCancionServicio := servicios.NuevoListaCancionServicio(client)
-	cancionServicio := servicios.NuevoCancionServicio(client)
-	itemIndiceServicio := servicios.NuevoItemIndiceCancionServicio(client)
-	//indiceServicio := servicios.NuevoIndiceServicio(client)
-	usuarioServicio := servicios.NuevoUsuarioServicio(client)
-
-	//listaNegocio := negocio.NuevoListaNegocio(cancionServicio, listaServicio, itemIndiceServicio)
-	usuarioNegocio := negocio.NuevoUsuarioNegocio(usuarioServicio, cancionServicio, listaServicio, itemIndiceServicio)
-
-	constroladorPerfil := controllers.NuevoPerfilController(perfilServicio, MyApp)
-	constroladorRTC := controllers.NuevoRTCController(MyApp)
-	constroladorAnswerRTC := controllers.NuevoAnswerRTCController(MyApp)
-	constroladorUpdateRTC := controllers.NuevoUpdateRTCController(MyApp)
-	constroladorSesiones := controllers.NuevoSesionesController(MyApp)
-	constroladorUsuarioSesiones := controllers.NuevoUsuariosSesion(MyApp)
-	constroladorCancionSesion := controllers.NuevoCancionSesionController(MyApp)
-	constroladorCancion := controllers.NuevoCancionController(cancionServicio, usuarioNegocio, MyApp)
-
-	controladorLista := controllers.NuevoListaController(usuarioNegocio, MyApp)
-	controladorItemIndice := controllers.NuevoItemCancionesListasController(usuarioNegocio, MyApp)
-	//controladorListaCancion := controllers.NuevoListaCancionController(listaCancionServicio, listaServicio, indiceServicio, MyApp)
-
-	loginRepo := logueadores.NewLogeadorRepository()
-	loginRepo.Add("USERPASS", logueadores.NewUserPassLogeador(usuarioServicio))
-
-	log.Println("Iniciando servidor en puerto", AppConfig.Port)
-	io := socket.NewServer(nil, nil)
-
-	// Registrar el manejador de socket.io con el router de Gin
-	// Se elimina http.Handle("/socket.io/", io.ServeHandler(nil))
-	// y se añade la siguiente línea:
-	router.Any("/socket.io/*any", gin.WrapH(io.ServeHandler(nil)))
-
-	err = io.On("connection", func(clients ...any) {
-		nuevaConexion(clients, *loginRepo)
-	})
-	if err != nil {
-		log.Fatalln("Error setting socket.io on connection", "err", err)
+		log.Fatalf("Error al crear el servidor: %v", err)
 	}
 
-	router.GET("/perfil", constroladorPerfil.Get)
-	router.POST("/perfil", constroladorPerfil.Post)
-	router.POST("/answerrtc", constroladorAnswerRTC.Post)
-	router.POST("/webrtc", constroladorRTC.Post)
-	router.POST("/updatertc", constroladorUpdateRTC.Post)
-	router.GET("/webrtc", constroladorRTC.Get)
+	// Canal para escuchar señales del sistema
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	router.GET("/sesiones", constroladorSesiones.Get)
-	router.GET("/usersesion", constroladorUsuarioSesiones.Get)
-	router.GET("/cancionsesion", constroladorCancionSesion.Get)
-	router.POST("/cancionsesion", constroladorCancionSesion.Post)
+	// Goroutine para manejar shutdown graceful
+	go func() {
+		<-sigChan
+		log.Println("Señal de shutdown recibida, cerrando servidor...")
 
-	// Rutas para listas
-	router.GET("/lista", controladorLista.Get)
-	router.POST("/lista", controladorLista.Post)
-	router.PUT("/lista", controladorLista.Put)
-	router.DELETE("/lista", controladorLista.Delete)
+		cancel() // Cancelar el contexto
 
-	router.GET("/cancion", constroladorCancion.Get)
-	router.POST("/cancion", constroladorCancion.Post)
-	router.DELETE("/cancion", constroladorCancion.Delete)
+		// Dar tiempo para shutdown graceful
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer shutdownCancel()
 
-	router.GET("/itemcancionlista", controladorItemIndice.GetCancionesLista)
-	router.POST("/itemcancionlista", controladorItemIndice.PostCancionesLista)
-	router.GET("/itemcancionusuario", controladorItemIndice.GetCancionesPorUsuario)
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			log.Printf("Error durante el shutdown: %v", err)
+		}
 
-	controladorListaSesion := controllers.NuevoListaSesionController(MyApp)
-	controladorNumeroCancion := controllers.NuevoNumeroCancionSesionController(MyApp)
-	controladorReproductor := controllers.NuevoReproductorSesionController(MyApp)
+		os.Exit(0)
+	}()
 
-	router.GET("/listasesion", controladorListaSesion.Get)
-	router.POST("/listasesion", controladorListaSesion.Post)
-	router.POST("/listasesionitem", controladorListaSesion.PostItem)
-	router.GET("/numerocancion", controladorNumeroCancion.Get)
-	router.POST("/numerocancion", controladorNumeroCancion.Post)
-	router.PUT("/numerocancion", controladorNumeroCancion.Put)
-	router.POST("/tocar", controladorReproductor.PostTocar)
-	router.POST("/tocarnro", controladorReproductor.PostTocarNro)
-	router.PUT("/tocarnro", controladorReproductor.PutTocarNro)
-	log.Fatalln(http.ListenAndServe(AppConfig.Port, router))
+	// Iniciar el servidor
+	if err := srv.Start(); err != nil {
+		log.Fatalf("Error al iniciar el servidor: %v", err)
+	}
 }

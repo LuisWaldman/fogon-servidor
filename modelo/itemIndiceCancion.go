@@ -1,6 +1,8 @@
 package modelo
 
 import (
+	"strconv"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -68,8 +70,15 @@ func BuildFromCancion(cancion *Cancion) *ItemIndiceCancion {
 		if bpm, ok := datosJSON["bpm"].(float64); ok {
 			item.BPM = int(bpm)
 		}
-		if calidad, ok := datosJSON["calidad"].(float64); ok {
-			item.Calidad = int(calidad)
+		if calidadVal, ok := datosJSON["calidad"]; ok {
+			switch v := calidadVal.(type) {
+			case string:
+				if calidadInt, err := strconv.Atoi(v); err == nil {
+					item.Calidad = calidadInt
+				}
+			case float64:
+				item.Calidad = int(v)
+			}
 		}
 		if compasCantidad, ok := datosJSON["compasCantidad"].(float64); ok {
 			item.CompasCantidad = int(compasCantidad)
