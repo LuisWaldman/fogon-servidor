@@ -6,8 +6,7 @@ import (
 
 	modelo "github.com/LuisWaldman/fogon-servidor/modelo"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -51,7 +50,7 @@ func (s *ItemIndiceCancionServicio) AgregarCancion(item *modelo.ItemIndiceCancio
 	return nil
 }
 
-func (s *ItemIndiceCancionServicio) GetCancionesPorListaID(listaID primitive.ObjectID) []*modelo.ItemIndiceCancion {
+func (s *ItemIndiceCancionServicio) GetCancionesPorListaID(listaID bson.ObjectID) []*modelo.ItemIndiceCancion {
 	col := s.db.Database(database).Collection(s.collection)
 	filter := bson.M{"listaId": listaID}
 	cursor, err := col.Find(context.TODO(), filter)
@@ -75,7 +74,7 @@ func (s *ItemIndiceCancionServicio) GetCancionesPorListaID(listaID primitive.Obj
 
 func (s *ItemIndiceCancionServicio) BorrarPorListaID(id string) error {
 	col := s.db.Database(database).Collection(s.collection)
-	objID, err := primitive.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
@@ -88,7 +87,7 @@ func (s *ItemIndiceCancionServicio) BorrarPorListaID(id string) error {
 
 func (s *ItemIndiceCancionServicio) BorrarPorID(id string) error {
 	col := s.db.Database(database).Collection(s.collection)
-	objID, err := primitive.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}

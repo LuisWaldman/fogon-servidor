@@ -3,13 +3,13 @@ package modelo
 import (
 	"strconv"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type ItemIndiceCancion struct {
-	ID      primitive.ObjectID `bson:"id" json:"id"`
-	ListaID primitive.ObjectID `bson:"listaId" json:"listaId"`
-	Orden   int                `bson:"orden" json:"orden"`
+	ID      bson.ObjectID `bson:"id" json:"id"`
+	ListaID bson.ObjectID `bson:"listaId" json:"listaId"`
+	Orden   int           `bson:"orden" json:"orden"`
 
 	OrigenUrl      string   `bson:"origenUrl" json:"origenUrl"`
 	FileName       string   `bson:"fileName" json:"fileName"`
@@ -32,7 +32,7 @@ type ItemIndiceCancion struct {
 
 func NewItemIndiceCancion(cancion string, banda string) *ItemIndiceCancion {
 	return &ItemIndiceCancion{
-		ID:             primitive.NewObjectID(),
+		ID:             bson.NewObjectID(),
 		OrigenUrl:      "",
 		FileName:       "",
 		Cancion:        cancion,
