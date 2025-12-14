@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
-	"github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -23,7 +22,6 @@ type Musico struct {
 	IPs       []string
 	Socket    Emitter
 	logRepo   logueadores.LogeadorRepository
-	config    config.Config
 	Sesion    *Sesion
 	Perfil    *modelo.Perfil
 	rolSesion string
@@ -144,7 +142,8 @@ func (musico *Musico) GenerarToken() {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(musico.config.JWTSecret))
+	const secr1et = "my_secret_key" // Replace with your actual secret key
+	tokenString, err := token.SignedString([]byte(secr1et))
 	if err != nil {
 		// Handle error, maybe send an error message to the client
 		fmt.Println("Error generating JWT:", err)
@@ -166,12 +165,11 @@ func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
 	}
 }
 
-func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository, cfg config.Config) *Musico {
+func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository) *Musico {
 	return &Musico{
 		ID:      0, // Default ID, should be set after login
 		Socket:  socket,
 		logRepo: logRepo,
-		config:  cfg,
 		Sesion:  nil,
 		Perfil: &modelo.Perfil{
 			Imagen: "",
