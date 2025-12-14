@@ -7,11 +7,10 @@ import (
 	"time"
 
 	"github.com/LuisWaldman/fogon-servidor/aplicacion/logueadores"
+	"github.com/LuisWaldman/fogon-servidor/config"
 	"github.com/LuisWaldman/fogon-servidor/modelo"
 	"github.com/golang-jwt/jwt/v5"
 )
-
-var jwtKey = []byte("your-secret-key")
 
 type Emitter interface {
 	Emit(ev string, args ...any) error
@@ -24,6 +23,7 @@ type Musico struct {
 	IPs       []string
 	Socket    Emitter
 	logRepo   logueadores.LogeadorRepository
+	config    config.Config
 	Sesion    *Sesion
 	Perfil    *modelo.Perfil
 	rolSesion string
@@ -144,7 +144,7 @@ func (musico *Musico) GenerarToken() {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString([]byte(musico.config.JWTSecret))
 	if err != nil {
 		// Handle error, maybe send an error message to the client
 		fmt.Println("Error generating JWT:", err)
@@ -166,11 +166,12 @@ func (musico *Musico) Login(modo string, par_1 string, par_2 string) {
 	}
 }
 
-func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository) *Musico {
+func NuevoMusico(socket Emitter, logRepo logueadores.LogeadorRepository, cfg config.Config) *Musico {
 	return &Musico{
 		ID:      0, // Default ID, should be set after login
 		Socket:  socket,
 		logRepo: logRepo,
+		config:  cfg,
 		Sesion:  nil,
 		Perfil: &modelo.Perfil{
 			Imagen: "",
@@ -191,14 +192,14 @@ func (musico *Musico) TieneSesion() bool {
 	return musico.Sesion != nil
 }
 
-func VerifyToken(tokenString string) (int, error) {
+func VerifyToken(tokenString string, jwtSecret string) (int, error) {
 	// Parse the token
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Ensure the signing method is correct
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return jwtKey, nil
+		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {
