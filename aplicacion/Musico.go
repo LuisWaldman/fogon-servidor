@@ -44,8 +44,6 @@ func (musico *Musico) ActualizarPerfil(perfil *modelo.Perfil) {
 
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.Sesion = sesion
-	musico.rolSesion = "default" // Default role for a musician
-	musico.emit("ensesion", sesion.nombre)
 	sesion.AgregarMusico(musico)
 }
 

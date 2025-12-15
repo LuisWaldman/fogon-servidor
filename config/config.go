@@ -18,7 +18,7 @@ func LoadConfiguration() Config {
 		LogLevel:    "ns",
 		MONGODB_URI: "mongodb://localhost:27017",
 		Site:        "http://localhost:5173",
-		JWTSecret:   "default-dev-secret-key-change-in-production",
+		JWTSecret:   "my_secret_key",
 	}
 
 	// Cargar valores desde variables de entorno
