@@ -12,8 +12,8 @@ import (
 func TestUsuarioNuevo(t *testing.T) {
 	client, err := datos.ConnectDB()
 	assert.Nil(t, err, "Error al conectar a la base de datos: %v", err)
-	nombreUsuario := "luis"
-	contraseña := "l"
+	nombreUsuario := "no"
+	contraseña := "m"
 	usuarioServicio := servicios.NuevoUsuarioServicio(client)
 	cancionServicio := servicios.NuevoCancionServicio(client)
 	listaServicio := servicios.NuevoListaServicio(client)
