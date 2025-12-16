@@ -7,6 +7,7 @@ type Config struct {
 	MONGODB_URI string `json:"MONGODB_URI"`
 	Site        string `json:"Site"`
 	LogLevel    string `json:"LogLevel"`
+	JWTSecret   string `json:"JWTSecret"`
 }
 
 func LoadConfiguration() Config {
@@ -17,10 +18,25 @@ func LoadConfiguration() Config {
 		LogLevel:    "ns",
 		//MONGODB_URI: "mongodb://localhost:27017",
 		//Site:        "http://localhost:5173",
+		JWTSecret: "my_secret_key",
 	}
-	// Try to get log level from environment variable, otherwise use default
-	if envLogLevel := os.Getenv("LOG_LEVEL"); envLogLevel != "" {
-		config.LogLevel = envLogLevel
+
+	// Cargar valores desde variables de entorno
+	if port := os.Getenv("FOGON_PUERTO"); port != "" {
+		config.Port = ":" + port
 	}
+	if mongoURI := os.Getenv("FOGON_DB"); mongoURI != "" {
+		config.MONGODB_URI = mongoURI
+	}
+	if site := os.Getenv("FOGON_SITE"); site != "" {
+		config.Site = site
+	}
+	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {
+		config.LogLevel = logLevel
+	}
+	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
+		config.JWTSecret = jwtSecret
+	}
+
 	return config
 }

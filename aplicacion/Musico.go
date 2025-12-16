@@ -11,8 +11,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("your-secret-key")
-
 type Emitter interface {
 	Emit(ev string, args ...any) error
 }
@@ -46,8 +44,6 @@ func (musico *Musico) ActualizarPerfil(perfil *modelo.Perfil) {
 
 func (musico *Musico) UnirseSesion(sesion *Sesion) {
 	musico.Sesion = sesion
-	musico.rolSesion = "default" // Default role for a musician
-	musico.emit("ensesion", sesion.nombre)
 	sesion.AgregarMusico(musico)
 }
 
@@ -144,7 +140,8 @@ func (musico *Musico) GenerarToken() {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	const secr1et = "my_secret_key" // Replace with your actual secret key
+	tokenString, err := token.SignedString([]byte(secr1et))
 	if err != nil {
 		// Handle error, maybe send an error message to the client
 		fmt.Println("Error generating JWT:", err)
@@ -191,14 +188,14 @@ func (musico *Musico) TieneSesion() bool {
 	return musico.Sesion != nil
 }
 
-func VerifyToken(tokenString string) (int, error) {
+func VerifyToken(tokenString string, jwtSecret string) (int, error) {
 	// Parse the token
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Ensure the signing method is correct
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return jwtKey, nil
+		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {

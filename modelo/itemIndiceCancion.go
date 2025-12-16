@@ -1,13 +1,15 @@
 package modelo
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strconv"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type ItemIndiceCancion struct {
-	ID      primitive.ObjectID `bson:"id" json:"id"`
-	ListaID primitive.ObjectID `bson:"listaId" json:"listaId"`
-	Orden   int                `bson:"orden" json:"orden"`
+	ID      bson.ObjectID `bson:"id" json:"id"`
+	ListaID bson.ObjectID `bson:"listaId" json:"listaId"`
+	Orden   int           `bson:"orden" json:"orden"`
 
 	OrigenUrl      string   `bson:"origenUrl" json:"origenUrl"`
 	FileName       string   `bson:"fileName" json:"fileName"`
@@ -30,7 +32,7 @@ type ItemIndiceCancion struct {
 
 func NewItemIndiceCancion(cancion string, banda string) *ItemIndiceCancion {
 	return &ItemIndiceCancion{
-		ID:             primitive.NewObjectID(),
+		ID:             bson.NewObjectID(),
 		OrigenUrl:      "",
 		FileName:       "",
 		Cancion:        cancion,
@@ -68,8 +70,15 @@ func BuildFromCancion(cancion *Cancion) *ItemIndiceCancion {
 		if bpm, ok := datosJSON["bpm"].(float64); ok {
 			item.BPM = int(bpm)
 		}
-		if calidad, ok := datosJSON["calidad"].(float64); ok {
-			item.Calidad = int(calidad)
+		if calidadVal, ok := datosJSON["calidad"]; ok {
+			switch v := calidadVal.(type) {
+			case string:
+				if calidadInt, err := strconv.Atoi(v); err == nil {
+					item.Calidad = calidadInt
+				}
+			case float64:
+				item.Calidad = int(v)
+			}
 		}
 		if compasCantidad, ok := datosJSON["compasCantidad"].(float64); ok {
 			item.CompasCantidad = int(compasCantidad)

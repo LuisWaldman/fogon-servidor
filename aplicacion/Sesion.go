@@ -15,6 +15,7 @@ type Sesion struct {
 	estado     string
 	inicio     float64
 	compas     int
+	roldefault string
 	Mutex      *sync.Mutex
 	cancion    modelo.Cancion
 	lista      []modelo.ItemIndiceCancion
@@ -47,11 +48,12 @@ func (sesion *Sesion) NuevoSDP(musico *Musico) {
 	sesion.Mutex.Unlock()
 }
 
-func NuevaSesion(nombre string) *Sesion {
+func NuevaSesion(nombre string, roldefault string) *Sesion {
 	return &Sesion{
-		nombre:  nombre,
-		musicos: make(map[int]*Musico),
-		Mutex:   &sync.Mutex{},
+		nombre:     nombre,
+		musicos:    make(map[int]*Musico),
+		Mutex:      &sync.Mutex{},
+		roldefault: roldefault,
 	}
 }
 
@@ -168,14 +170,16 @@ func (sesion *Sesion) AgregarMusico(musico *Musico) {
 	if musico == nil {
 		return
 	}
+	musico.rolSesion = sesion.roldefault
 	if sesion.musicos == nil {
 		sesion.musicos = make(map[int]*Musico)
-		musico.SetRolSesion("director")
+		musico.rolSesion = "director"
 	} else {
 		if len(sesion.musicos) == 0 {
-			musico.SetRolSesion("director")
+			musico.rolSesion = "director"
 		}
 	}
+	musico.emit("ensesion", sesion.nombre, musico.rolSesion)
 	sesion.musicos[musico.ID] = musico
 	if sesion.estado == "reproduciendo" {
 		musico.Socket.Emit("cancionIniciada", sesion.compas, sesion.inicio)
