@@ -14,10 +14,10 @@ func LoadConfiguration() Config {
 	var config Config = Config{
 		Port:        ":8080",
 		MONGODB_URI: "mongodb+srv://luis:luis@cluster0.n2rothk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-		Site:        "https://www.fogon.ar",
-		LogLevel:    "ns",
+		//Site:        "https://www.fogon.ar",
+		LogLevel: "ns",
 		//MONGODB_URI: "mongodb://localhost:27017",
-		//Site:        "http://localhost:5173",
+		Site:      "http://localhost:5173",
 		JWTSecret: "my_secret_key",
 	}
 

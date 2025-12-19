@@ -20,11 +20,15 @@ func (s *Server) nuevaConexion(clients []any) {
 func (s *Server) setupSocketHandlers(newSocket *socket.Socket, newMusico *aplicacion.Musico) {
 	newSocket.On("login", func(datas ...any) {
 		if len(datas) == 3 {
-			modo := datas[0].(string)
-			par_1 := datas[1].(string)
-			par_2 := datas[2].(string)
-			log.Println("LOGIN - Modo:", modo, "par_1:", par_1, "par_2:", par_2)
-			newMusico.Login(modo, par_1, par_2)
+			modo, ok1 := datas[0].(string)
+			par_1, ok2 := datas[1].(string)
+			par_2, ok3 := datas[2].(string)
+			if ok1 && ok2 && ok3 {
+				log.Println("LOGIN - Modo:", modo, "par_1:", par_1, "par_2:", par_2)
+				newMusico.Login(modo, par_1, par_2)
+			} else {
+				log.Println("Error: Los datos de login no son del tipo string esperado")
+			}
 		}
 	})
 
@@ -39,11 +43,14 @@ func (s *Server) setupSocketHandlers(newSocket *socket.Socket, newMusico *aplica
 
 	newSocket.On("crearsesion", func(datas ...any) {
 		if len(datas) == 2 {
-			sesion := datas[0].(string)
-			roldefault := datas[1].(string)
-
-			log.Println("CREAR SESION - Sesion:", sesion)
-			s.app.CrearSesion(newMusico, sesion, roldefault)
+			sesion, ok1 := datas[0].(string)
+			roldefault, ok2 := datas[1].(string)
+			if ok1 && ok2 {
+				log.Println("CREAR SESION - Sesion:", sesion)
+				s.app.CrearSesion(newMusico, sesion, roldefault)
+			} else {
+				log.Println("Error: Los datos de crear sesion no son del tipo string esperado")
+			}
 		}
 	})
 
@@ -55,52 +62,90 @@ func (s *Server) setupSocketHandlers(newSocket *socket.Socket, newMusico *aplica
 
 	newSocket.On("unirmesesion", func(datas ...any) {
 		if len(datas) == 1 {
-			sesion := datas[0].(string)
-			log.Println("unirmesesion - Sesion:", sesion)
-			s.app.UnirseSesion(newMusico, sesion)
+			sesion, ok := datas[0].(string)
+			if ok {
+				log.Println("unirmesesion - Sesion:", sesion)
+				s.app.UnirseSesion(newMusico, sesion)
+			} else {
+				log.Println("Error: El dato de sesion no es del tipo string esperado")
+			}
 		}
 	})
 
 	newSocket.On("mensajeasesion", func(datas ...any) {
 		if len(datas) == 1 {
-			msj := datas[0].(string)
-			log.Println("mensajeasesion - Sesion:", msj)
-			newMusico.MensajeSesion(msj)
+			msj, ok := datas[0].(string)
+			if ok {
+				log.Println("mensajeasesion - Sesion:", msj)
+				newMusico.MensajeSesion(msj)
+			} else {
+				log.Println("Error: El mensaje no es del tipo string esperado")
+			}
 		}
 	})
 
 	newSocket.On("iniciarReproduccion", func(datas ...any) {
 		if len(datas) == 2 {
-			compas := datas[0].(float64)
-			momento := datas[1].(float64)
-			log.Println("iniciarReproduccion - Sesion:", compas, "Momento:", momento)
-			newMusico.IniciarReproduccion(int(compas), momento)
+			compas, ok1 := datas[0].(float64)
+			momento, ok2 := datas[1].(float64)
+			if ok1 && ok2 {
+				log.Println("iniciarReproduccion - Sesion:", compas, "Momento:", momento)
+				newMusico.IniciarReproduccion(int(compas), momento)
+			} else {
+				log.Println("Error: Los datos de iniciar reproduccion no son del tipo float64 esperado")
+			}
 		}
 	})
 
 	newSocket.On("sincronizarReproduccion", func(datas ...any) {
 		if len(datas) == 2 {
-			compas := datas[0].(float64)
-			delayms := datas[1].(float64)
-			log.Println("sincronizarReproduccion - Sesion:", compas, "Delay:", delayms)
-			newMusico.SincronizarReproduccion(int(compas), delayms)
+			compas, ok1 := datas[0].(float64)
+			delayms, ok2 := datas[1].(float64)
+			if ok1 && ok2 {
+				log.Println("sincronizarReproduccion - Sesion:", compas, "Delay:", delayms)
+				newMusico.SincronizarReproduccion(int(compas), delayms)
+			} else {
+				log.Println("Error: Los datos de sincronizar reproduccion no son del tipo float64 esperado")
+			}
 		}
 	})
 
 	newSocket.On("cambiarEstado", func(datas ...any) {
 		log.Println("cambiarEstado - Sesion:")
 		if len(datas) == 1 {
-			estado := datas[0].(string)
-			log.Println("iniciarReproduccion - Sesion:", estado)
-			newMusico.CambiarEstado(estado)
+			estado, ok := datas[0].(string)
+			if ok {
+				log.Println("cambiarEstado - Estado:", estado)
+				newMusico.CambiarEstado(estado)
+			} else {
+				log.Println("Error: El estado no es del tipo string esperado")
+			}
 		}
 	})
 
 	newSocket.On("actualizarCompas", func(datas ...any) {
 		if len(datas) == 1 {
-			compas := datas[0].(float64)
-			log.Println("actualizarCompas - Sesion:", compas)
-			newMusico.ActualizarCompas(int(compas))
+			compas, ok := datas[0].(float64)
+			if ok {
+				log.Println("actualizarCompas - Sesion:", compas)
+				newMusico.ActualizarCompas(int(compas))
+			} else {
+				log.Println("Error: El compas no es del tipo float64 esperado")
+			}
+		}
+	})
+
+	newSocket.On("setrolausuario", func(datas ...any) {
+		if len(datas) == 2 {
+			usuarioIDInt, ok1 := datas[0].(float64) // Los números de JavaScript llegan como float64
+			rol, ok2 := datas[1].(string)
+			if ok1 && ok2 {
+				usuarioID := int(usuarioIDInt)
+				log.Println("setrolausuario - UsuarioID:", usuarioID, "Rol:", rol)
+				newMusico.SetRolAUsuario(usuarioID, rol)
+			} else {
+				log.Println("Error: Los datos recibidos no son del tipo esperado (int, string)")
+			}
 		}
 	})
 
