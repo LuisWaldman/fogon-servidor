@@ -17,7 +17,7 @@ func LoadConfiguration() Config {
 		Site:        "https://www.fogon.ar",
 		LogLevel:    "ns",
 		//MONGODB_URI: "mongodb://localhost:27017",
-		//Site:        "http://localhost:5173",
+		//Site:      "http://localhost:5173",
 		JWTSecret: "my_secret_key",
 	}
 

@@ -304,3 +304,14 @@ func (sesion *Sesion) GetNroCancion() int {
 	defer sesion.Mutex.Unlock()
 	return sesion.nroCancion
 }
+
+func (sesion *Sesion) SetRolAUsuario(musicoId int, rol string) {
+	sesion.Mutex.Lock()
+	for _, musico := range sesion.musicos {
+		if musicoId == musico.ID {
+			musico.SetRolSesion(rol)
+		}
+	}
+
+	defer sesion.Mutex.Unlock()
+}

@@ -122,6 +122,14 @@ func (musico *Musico) ActualizarCompas(compas int) {
 	musico.Sesion.ActualizarCompas(compas)
 }
 
+func (musico *Musico) SetRolAUsuario(usuarioID int, rol string) {
+	if musico.Sesion == nil {
+		musico.emit("error", "No session joined")
+		return
+	}
+	musico.Sesion.SetRolAUsuario(usuarioID, rol)
+}
+
 func (musico *Musico) MensajeSesion(msj string) {
 	if musico.Sesion == nil {
 		musico.emit("error", "No session joined")
