@@ -1,10 +1,32 @@
 package modelo
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
+
+// FlexInt acepta tanto número como string en JSON (ej: "calidad":"2" o "calidad":2)
+type FlexInt int
+
+func (f *FlexInt) UnmarshalJSON(data []byte) error {
+	var n int
+	if err := json.Unmarshal(data, &n); err == nil {
+		*f = FlexInt(n)
+		return nil
+	}
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	*f = FlexInt(n)
+	return nil
+}
 
 type ItemIndiceCancion struct {
 	ID      bson.ObjectID `bson:"id" json:"id"`
@@ -28,6 +50,49 @@ type ItemIndiceCancion struct {
 	Video          bool     `bson:"video" json:"video"`
 	Pentagramas    []string `bson:"pentagramas" json:"pentagramas"`
 	Etiquetas      []string `bson:"etiquetas" json:"etiquetas"`
+}
+
+type ItemIndiceCancionGET struct {
+	OrigenUrl      string   `json:"origenUrl"`
+	FileName       string   `json:"fileName"`
+	Cancion        string   `json:"cancion"`
+	Banda          string   `json:"banda"`
+	Acordes        string   `json:"acordes"`
+	Owner          string   `json:"owner"`
+	Escala         string   `json:"escala"`
+	TotalCompases  int      `json:"totalCompases"`
+	CompasUnidad   int      `json:"compasUnidad"`
+	CompasCantidad int      `json:"compasCantidad"`
+	BPM            int      `json:"bpm"`
+	CantAcordes    int      `json:"cantacordes"`
+	CantPartes     int      `json:"cantpartes"`
+	Calidad        FlexInt  `json:"calidad"`
+	Video          bool     `json:"video"`
+	Pentagramas    []string `json:"pentagramas"`
+	Etiquetas      []string `json:"etiquetas"`
+}
+
+func (g *ItemIndiceCancionGET) ToItemIndiceCancion() *ItemIndiceCancion {
+	return &ItemIndiceCancion{
+		ID:             bson.NewObjectID(),
+		OrigenUrl:      g.OrigenUrl,
+		FileName:       g.FileName,
+		Cancion:        g.Cancion,
+		Banda:          g.Banda,
+		Acordes:        g.Acordes,
+		Owner:          g.Owner,
+		Escala:         g.Escala,
+		TotalCompases:  g.TotalCompases,
+		CompasUnidad:   g.CompasUnidad,
+		CompasCantidad: g.CompasCantidad,
+		BPM:            g.BPM,
+		CantAcordes:    g.CantAcordes,
+		CantPartes:     g.CantPartes,
+		Calidad:        int(g.Calidad),
+		Video:          g.Video,
+		Pentagramas:    g.Pentagramas,
+		Etiquetas:      g.Etiquetas,
+	}
 }
 
 func NewItemIndiceCancion(cancion string, banda string) *ItemIndiceCancion {

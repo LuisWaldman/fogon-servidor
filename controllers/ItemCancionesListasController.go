@@ -67,13 +67,16 @@ func (controller *ItemCancionesListasController) PostCancionesLista(c *gin.Conte
 		owner = musico.Usuario
 	}
 
-	var item modelo.ItemIndiceCancion
-	if err := c.ShouldBindJSON(&item); err != nil {
+	var itemGET modelo.ItemIndiceCancionGET
+	if err := c.ShouldBindJSON(&itemGET); err != nil {
+		log.Println("[PostCancionesLista] bind error:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
 		return
 	}
+	item := itemGET.ToItemIndiceCancion()
+	item.Owner = owner
 
-	err := controller.usuarioNegocio.AgregarCancionALista(nombreLista, owner, &item)
+	err := controller.usuarioNegocio.AgregarCancionALista(nombreLista, owner, item)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
